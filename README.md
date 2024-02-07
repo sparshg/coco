@@ -1,6 +1,8 @@
 # TODO:
 
 - [ ] Double input buffer
+- [ ] Handle EOF for lexer
+- [ ] Handle `23.34hello` won't give error
 
 # How to run
 
