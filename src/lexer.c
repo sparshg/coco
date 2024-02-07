@@ -104,8 +104,8 @@ int try_multipath(char* str) {
         case '>':
             if (next(str) == '=') return TK_GE;
             return TK_GT;
-        case '_':
-            int save = &str;
+        case '_': {
+            char* save = str;
             if (next(str) == 'm' && next(str) == 'a' && next(str) == 'i' && next(str) == 'n')
                 return TK_MAIN;
             str = save;
@@ -115,10 +115,12 @@ int try_multipath(char* str) {
             while (isdigit(next(str)))
                 ;
             return TK_ID;
+        }
     }
     return error();
 }
 
 int try_id(char* str) {
     // Anything starting with [a-z]
+    if (!isalpha(next(str))) return error();
 }
