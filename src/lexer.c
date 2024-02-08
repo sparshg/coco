@@ -11,23 +11,28 @@ enum Token {
     // clang-format on
 };
 
-int error() {
-    printf("Error");
-    exit(1);
+Token error() {
+    return -1;
 }
 
-char next(char* str) {
+char next(char** str) {
     // Return current char, and move to next
     // TODO: Handle EOF
-    return *(str++);
+    return *((*str)++);
 }
 
-char current(char* str) {
+char current(char** str) {
     // Return current char
     // TODO: Handle EOF
-    return *str;
+    return **str;
 }
-int try_special(char* str) {
+
+void skip_whitespace(char** str) {
+    while (isspace(current(str)))
+        (*str)++;
+}
+
+Token try_special(char** str) {
     // % [ ] , ; : . ( ) + - * / ~
     // clang-format off
     switch (next(str)) {
@@ -50,7 +55,7 @@ int try_special(char* str) {
     return error();
 }
 
-int try_chained(char* str) {
+Token try_chained(char** str) {
     Token token;
     // #[a-z][a-z]* &&& @@@ != ==
 
@@ -77,14 +82,15 @@ int try_chained(char* str) {
     return error();
 }
 
-int try_number(char* str) {
+Token try_number(char** str) {
     // [0-9][0-9]*
     // [0-9][0-9]*[.][0-9][0-9]
     // [0-9][0-9]*[.][0-9][0-9][E][+|-|e][0-9][0-9]
     if (!isdigit(next(str))) return error();
-    while (isdigit(next(str)))
-        ;
-    if (next(str) == '.' && isdigit(next(str)) && isdigit(next(str))) {
+    while (isdigit(current(str)))
+        (*str)++;
+
+    if (current(str) == '.' && isdigit(next(str)) && isdigit(next(str))) {
         if (next(str) == 'E' && (next(str) == '+' || current(str) == '-') && isdigit(next(str)) && isdigit(next(str))) {
             return TK_RNUM;
         }
@@ -93,7 +99,7 @@ int try_number(char* str) {
     return TK_NUM;
 }
 
-int try_multipath(char* str) {
+Token try_multipath(char** str) {
     // < <= <--- > >= _main _[a-z|A-Z][a-z|A-Z]*[0-9]*
     switch (next(str)) {
         case '<':
@@ -105,7 +111,7 @@ int try_multipath(char* str) {
             if (next(str) == '=') return TK_GE;
             return TK_GT;
         case '_': {
-            char* save = str;
+            char** save = str;
             if (next(str) == 'm' && next(str) == 'a' && next(str) == 'i' && next(str) == 'n')
                 return TK_MAIN;
             str = save;
@@ -120,7 +126,31 @@ int try_multipath(char* str) {
     return error();
 }
 
-int try_id(char* str) {
+Token try_id(char** str) {
     // Anything starting with [a-z]
     if (!isalpha(next(str))) return error();
+    return error();
+}
+
+Token try_all(char** str) {
+    // Try all tokens
+    Token token = -1;
+    char* save = *str;
+    // printf("Try all at %c\n", current(str));
+    if ((token = try_special(str)) != -1) return token;
+    *str = save;
+    // printf("Special failed now at %c\n", current(str));
+    if ((token = try_chained(str)) != -1) return token;
+    *str = save;
+    // printf("Chained failed now at %c\n", current(str));
+    if ((token = try_number(str)) != -1) return token;
+    *str = save;
+    // printf("Number failed now at %c\n", current(str));
+    if ((token = try_multipath(str)) != -1) return token;
+    *str = save;
+    // printf("Multipath failed now at %c\n", current(str));
+    if ((token = try_id(str)) != -1) return token;
+    *str = save;
+    // printf("ID failed now at %c\n", current(str));
+    return error();
 }
