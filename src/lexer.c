@@ -74,8 +74,7 @@ Token try_chained(char** str) {
                 return TK_AND;
         case '#':
             if (islower(next(str))) {
-                while (islower(next(str)))
-                    ;
+                while (islower(current(str))) (*str)++;
                 return TK_RUID;
             }
     }
@@ -87,15 +86,18 @@ Token try_number(char** str) {
     // [0-9][0-9]*[.][0-9][0-9]
     // [0-9][0-9]*[.][0-9][0-9][E][+|-|e][0-9][0-9]
     if (!isdigit(next(str))) return error();
-    while (isdigit(current(str)))
-        (*str)++;
-
-    if (current(str) == '.' && isdigit(next(str)) && isdigit(next(str))) {
+    while (isdigit(current(str))) (*str)++;
+    char* save = *str;
+    // printf("At %c %c %c\n", next(str));
+    if (next(str) == '.' && isdigit(next(str)) && isdigit(next(str))) {
+        char* save2 = *str;
         if (next(str) == 'E' && (next(str) == '+' || current(str) == '-') && isdigit(next(str)) && isdigit(next(str))) {
             return TK_RNUM;
         }
+        *str = save2;
         return TK_RNUM;
     }
+    *str = save;
     return TK_NUM;
 }
 
@@ -111,16 +113,14 @@ Token try_multipath(char** str) {
             if (next(str) == '=') return TK_GE;
             return TK_GT;
         case '_': {
-            char** save = str;
+            char* save = *str;
             if (next(str) == 'm' && next(str) == 'a' && next(str) == 'i' && next(str) == 'n')
                 return TK_MAIN;
-            str = save;
+            *str = save;
             if (!isalpha(next(str))) return error();
-            while (isalpha(next(str)))
-                ;
-            while (isdigit(next(str)))
-                ;
-            return TK_ID;
+            while (isalpha(current(str))) (*str)++;
+            while (isdigit(current(str))) (*str)++;
+            return TK_FUNID;
         }
     }
     return error();
