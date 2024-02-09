@@ -11,6 +11,11 @@ enum Token {
     // clang-format on
 };
 
+struct Entry {
+    char* name;
+    Token tk;
+};
+
 Token error() {
     return -1;
 }
@@ -104,14 +109,20 @@ Token try_number(char** str) {
 Token try_multipath(char** str) {
     // < <= <--- > >= _main _[a-z|A-Z][a-z|A-Z]*[0-9]*
     switch (next(str)) {
-        case '<':
+        case '<': {
+            char* save = *str;
             if (next(str) == '=') return TK_LE;
             if (current(str) == '-' && next(str) == '-' && next(str) == '-')
                 return TK_ASSIGNOP;
+            *str = save;
             return TK_LT;
-        case '>':
+        }
+        case '>': {
+            char* save = *str;
             if (next(str) == '=') return TK_GE;
+            *str = save;
             return TK_GT;
+        }
         case '_': {
             char* save = *str;
             if (next(str) == 'm' && next(str) == 'a' && next(str) == 'i' && next(str) == 'n')
