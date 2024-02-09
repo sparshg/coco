@@ -93,7 +93,6 @@ Token try_number(char** str) {
     if (!isdigit(next(str))) return error();
     while (isdigit(current(str))) (*str)++;
     char* save = *str;
-    // printf("At %c %c %c\n", next(str));
     if (next(str) == '.' && isdigit(next(str)) && isdigit(next(str))) {
         char* save2 = *str;
         if (next(str) == 'E' && (next(str) == '+' || current(str) == '-') && isdigit(next(str)) && isdigit(next(str))) {
@@ -147,21 +146,15 @@ Token try_all(char** str) {
     // Try all tokens
     Token token = -1;
     char* save = *str;
-    // printf("Try all at %c\n", current(str));
     if ((token = try_special(str)) != -1) return token;
     *str = save;
-    // printf("Special failed now at %c\n", current(str));
     if ((token = try_chained(str)) != -1) return token;
     *str = save;
-    // printf("Chained failed now at %c\n", current(str));
     if ((token = try_number(str)) != -1) return token;
     *str = save;
-    // printf("Number failed now at %c\n", current(str));
     if ((token = try_multipath(str)) != -1) return token;
     *str = save;
-    // printf("Multipath failed now at %c\n", current(str));
     if ((token = try_id(str)) != -1) return token;
     *str = save;
-    // printf("ID failed now at %c\n", current(str));
     return error();
 }

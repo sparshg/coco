@@ -1,8 +1,9 @@
 # TODO:
 
-- [ ] Double input buffer
-- [ ] Handle EOF for lexer
-- [ ] Handle `23.34hello` won't give error
+- [ ] Handle File IO
+- [ ] Implement Double input buffer
+- [ ] Implement Lookup table
+- [ ] Implement keyword/indentifier lexing
 
 # How to run
 

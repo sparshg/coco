@@ -23,10 +23,10 @@ int main(int argc, char* argv[]) {
     //     printf("%s\n", table[i]);
     // }
 
-    char* str = "203\n203\n<--->%/_main([])>=#a00.00E+09";
+    char* str = "203\n203\n<--->===_hi%/_main([])>=#a00.00E+09";
     char* start;
-    int count = 0;
-    while (*str != '\0' && count++ < 20) {
+
+    while (*str != '\0') {
         start = str;
         int token = try_all(&str);
         if (token == -1) {
