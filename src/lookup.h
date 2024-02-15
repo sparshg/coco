@@ -1,18 +1,30 @@
 #ifndef LOOKUP_H
 #define LOOKUP_H
 
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+
 typedef char* string;
 
-struct LookupTable{
-    string* table;
+typedef struct TableEntry{
+    string lexeme;
+    int token;
+} TableEntry;
+
+typedef struct TableEntry* Record;
+
+typedef struct LookupTable{
+    Record table;
     int length;
     int size;
-};
+} LookupTable;
 
 typedef struct LookupTable* LOOKUP;
 
 LOOKUP _InitTable();
-bool _FindLexeme(LOOKUP lookup, string lexeme);
-void _InsertLexeme(LOOKUP lookup, string lexeme);
+int _FindLexeme(LOOKUP lookup, string lexeme);
+int _InsertLexeme(LOOKUP lookup, string lexeme, int token);
 
 #endif
