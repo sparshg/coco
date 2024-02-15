@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "lexer.h"
+#include "lookup.h"
 
 #define MAX_KEYWORD_LEN 20 + 1
 
@@ -22,6 +23,8 @@ int main(int argc, char* argv[]) {
     // for (int i = 0; i < num_keywords; i++) {
     //     printf("%s\n", table[i]);
     // }
+
+    LOOKUP LK_Table = _InitTable();
 
     char* str = "203\n203\n<--->===_hi%/_main([])>=#a00.00E+09";
     char* start;
