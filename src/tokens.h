@@ -1,5 +1,5 @@
 #ifndef TOKENS_H
-#define TOKEN_H
+#define TOKENS_H
 
 typedef enum Token Token;
 

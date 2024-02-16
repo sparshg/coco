@@ -87,7 +87,8 @@ Token try_number(char** str) {
     if (!isdigit(next(str))) return error();
     while (isdigit(current(str))) (*str)++;
     char* save = *str;
-    if (next(str) == '.' && isdigit(next(str)) && isdigit(next(str))) {
+    if (next(str) == '.' && isdigit(next(str))) {
+        if (!isdigit(next(str))) return error();
         char* save2 = *str;
         if (next(str) == 'E' && (next(str) == '+' || current(str) == '-') && isdigit(next(str)) && isdigit(next(str))) {
             return TK_RNUM;
@@ -105,8 +106,11 @@ Token try_multipath(char** str) {
         case '<': {
             char* save = *str;
             if (next(str) == '=') return TK_LE;
-            if (current(str) == '-' && next(str) == '-' && next(str) == '-')
-                return TK_ASSIGNOP;
+            if (current(str) == '-' && next(str) == '-') {
+                if (next(str) == '-')
+                    return TK_ASSIGNOP;
+                return error();
+            }
             *str = save;
             return TK_LT;
         }

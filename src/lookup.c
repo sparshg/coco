@@ -48,7 +48,7 @@ LOOKUP _InitTable() {
     return lookup;
 }
 
-int _FindLexeme(LOOKUP lookup, string lexeme) {
+int _FindLexeme(LOOKUP lookup, char* lexeme) {
     for (int i = 0; i < lookup->length; i++) {
         if (strcmp(lookup->table[i].lexeme, lexeme) == 0) {
             return i;
@@ -58,7 +58,7 @@ int _FindLexeme(LOOKUP lookup, string lexeme) {
     return -1;
 }
 
-int _InsertLexeme(LOOKUP lookup, string lexeme, int token) {
+int _InsertLexeme(LOOKUP lookup, char* lexeme, int token) {
     int index = _FindLexeme(lookup, lexeme);
     if (index >= 0) {
         return index;

@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 
     LOOKUP LK_Table = _InitTable();
 
-    char* str = "203\n203\n<--->===_hi%/_main([])>=#a00.00E+09";
+    char* str = "203\n203\n<--->===_hi%/_main([])>=#a00.00E+09 <--";
     char* start;
 
     while (*str != '\0') {
