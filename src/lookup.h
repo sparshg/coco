@@ -1,21 +1,21 @@
 #ifndef LOOKUP_H
 #define LOOKUP_H
 
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 typedef char* string;
 
-typedef struct TableEntry{
+typedef struct TableEntry {
     string lexeme;
     int token;
 } TableEntry;
 
 typedef struct TableEntry* Record;
 
-typedef struct LookupTable{
+typedef struct LookupTable {
     Record table;
     int length;
     int size;
