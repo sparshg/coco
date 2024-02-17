@@ -1,13 +1,18 @@
+
 #include "lookup.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "tokens.h"
 
-LOOKUP _InitTable() {
+LOOKUP_TABLE _InitTable() {
     // Creating a new LookupTable struct
-    LOOKUP lookup = (LOOKUP)malloc(sizeof(LookupTable));
+    LOOKUP_TABLE lookup = (LOOKUP_TABLE)malloc(sizeof(LookupTable));
 
     // Initialising LookupTable fields
-    lookup->table = (Record)malloc(29 * sizeof(TableEntry));
+    lookup->table = (TABLE_ENTRY)malloc(29 * sizeof(TableEntry));
     lookup->length = 0;
     lookup->size = 29;
 
@@ -40,6 +45,7 @@ LOOKUP _InitTable() {
     lookup->table[p++] = (TableEntry){.lexeme = "return", .token = TK_RETURN};
     lookup->table[p++] = (TableEntry){.lexeme = "call", .token = TK_CALL};
     lookup->table[p++] = (TableEntry){.lexeme = "record", .token = TK_RECORD};
+    lookup->table[p++] = (TableEntry){.lexeme = "endrecord", .token = TK_ENDRECORD};
     lookup->table[p++] = (TableEntry){.lexeme = "else", .token = TK_ELSE};
     lookup->table[p++] = (TableEntry){.lexeme = "with", .token = TK_WITH};
 
@@ -48,7 +54,7 @@ LOOKUP _InitTable() {
     return lookup;
 }
 
-int _FindLexeme(LOOKUP lookup, char* lexeme) {
+int _FindLexeme(LOOKUP_TABLE lookup, char* lexeme) {
     for (int i = 0; i < lookup->length; i++) {
         if (strcmp(lookup->table[i].lexeme, lexeme) == 0) {
             return i;
@@ -58,7 +64,7 @@ int _FindLexeme(LOOKUP lookup, char* lexeme) {
     return -1;
 }
 
-int _InsertLexeme(LOOKUP lookup, char* lexeme, int token) {
+int _InsertLexeme(LOOKUP_TABLE lookup, char* lexeme, int token) {
     int index = _FindLexeme(lookup, lexeme);
     if (index >= 0) {
         return index;
@@ -68,7 +74,7 @@ int _InsertLexeme(LOOKUP lookup, char* lexeme, int token) {
             printf("R\n");
             int new_size = (lookup->size * 3) / 2;
             // string* temp = lookup->table;
-            lookup->table = (Record)realloc(lookup->table, new_size * sizeof(TableEntry));
+            lookup->table = (TABLE_ENTRY)realloc(lookup->table, new_size * sizeof(TableEntry));
             lookup->size = new_size;
         }
 
@@ -78,7 +84,7 @@ int _InsertLexeme(LOOKUP lookup, char* lexeme, int token) {
 }
 
 // int main(){
-//     LOOKUP lookup = _InitTable();
+//     LOOKUP_TABLE lookup = _InitTable();
 
 //     // // Code for Debugging LOOKUP_TABLE
 //     printf("%d\n", lookup->length);
