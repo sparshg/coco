@@ -5,11 +5,6 @@
 
 #include "tokens.h"
 
-struct Entry {
-    char* name;
-    Token tk;
-};
-
 Token error() {
     return -1;
 }
@@ -35,7 +30,7 @@ Token try_special(char** str) {
     // % [ ] , ; : . ( ) + - * / ~
     // clang-format off
     switch (next(str)) {
-        case '%': return TK_COMMENT;
+        case '%': { while (next(str) != '\n'); return TK_COMMENT; }
         case '[': return TK_SQL;
         case ']': return TK_SQR;
         case ',': return TK_COMMA;
