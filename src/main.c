@@ -8,18 +8,6 @@
 #include "tokens.h"
 
 int main(int argc, char* argv[]) {
-    // int num_keywords = sizeof(keywords) / sizeof(keywords[0]);
-    // char** table = malloc(num_keywords * sizeof(char*));
-    // for (int i = 0; i < num_keywords; i++) {
-    //     table[i] = malloc(MAX_KEYWORD_LEN * sizeof(char));
-    //     strcpy(table[i], keywords[i]);
-    // }
-    // for (int i = 0; i < num_keywords; i++) {
-    //     printf("%s\n", table[i]);
-    // }
-
-    LOOKUP_TABLE LK_Table = _InitTable();
-
     char* str = "203\n203\n<--->===_hi%/_main([])>=#a00.00E+09 <--";
     char* start;
 

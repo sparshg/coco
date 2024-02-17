@@ -1,5 +1,7 @@
 #include "tokens.h"
 
+#include <string.h>
+
 Token string_to_token(char* str) {
     for (int i = 0; i < TOKENS_LEN; i++) {
         if (strcmp(str, tokens[i]) == 0) {
@@ -10,5 +12,5 @@ Token string_to_token(char* str) {
 }
 
 char* token_to_string(Token token) {
-    return tokens[token];
+    return (char*)tokens[token];
 }
