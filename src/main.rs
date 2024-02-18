@@ -1,7 +1,7 @@
 use core::panic;
 use std::{
     collections::{HashMap, HashSet},
-    ffi::{c_char, CStr},
+    env,
 };
 #[derive(Debug)]
 
@@ -67,15 +67,15 @@ fn follow(grammar: &Grammar, symbol: &String) -> HashSet<String> {
     result
 }
 
-#[no_mangle]
-pub extern "C" fn firstFollow(filename: *const c_char) {
+fn main() {
     let mut grammar = Grammar {
         start: String::new(),
         terminals: HashSet::new(),
         non_terminals: HashSet::new(),
         rules: HashMap::new(),
     };
-    for line in std::fs::read_to_string(unsafe { CStr::from_ptr(filename).to_str().unwrap() })
+    let filename = env::args().nth(1).unwrap_or("grammar.txt".to_string());
+    for line in std::fs::read_to_string(filename)
         .expect("No such file")
         .lines()
     {
