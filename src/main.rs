@@ -36,8 +36,11 @@ fn first(grammar: &Grammar, symbol: &String) -> HashSet<String> {
     result
 }
 
-fn follow(grammar: &Grammar, symbol: &String) -> HashSet<String> {
+fn follow(grammar: &Grammar, symbol: &String, track: &mut HashSet<String>) -> HashSet<String> {
     let mut result = HashSet::new();
+    if track.contains(symbol) {
+        return result;
+    }
     if symbol == &grammar.start {
         result.insert("$".to_string());
     }
@@ -53,7 +56,12 @@ fn follow(grammar: &Grammar, symbol: &String) -> HashSet<String> {
                         j += 1;
                         if j == rule.len() {
                             if lhs != symbol {
-                                result = result.union(&follow(grammar, lhs)).cloned().collect();
+                                track.insert(symbol.clone());
+                                result = result
+                                    .union(&follow(grammar, lhs, track))
+                                    .cloned()
+                                    .collect();
+                                track.remove(symbol);
                             }
                             break;
                         }
@@ -116,12 +124,13 @@ fn main() {
                 .and_modify(|v| v.last_mut().unwrap().push(word.to_string()));
         }
     }
-    // dbg!(&grammar);
     for nt in &grammar.non_terminals {
         println!("{}: {:?}", nt, first(&grammar, nt));
     }
+    let mut track = HashSet::new();
     println!();
     for nt in &grammar.non_terminals {
-        println!("{}: {:?}", nt, follow(&grammar, nt));
+        print!("{}: ", nt);
+        println!("{:?}", follow(&grammar, &nt.to_string(), &mut track));
     }
 }
