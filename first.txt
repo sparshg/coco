@@ -1,101 +1,200 @@
-<iterativeStmt>: TK_WHILE
-<otherFunctions>: TK_FUNID, ∈
-<definetypestmt>: TK_DEFINETYPE
-<arithmeticExpression>: TK_RNUM, TK_NUM, TK_ID, TK_OP
-<factor>: TK_NUM, TK_ID, TK_OP, TK_RNUM
-<more_ids>: TK_COMMA, ∈
-<constructedDatatype>: TK_UNION, TK_RECORD, TK_RUID
-<typeDefinitions>: TK_UNION, TK_DEFINETYPE, TK_RECORD, ∈
-<parameter_list>: TK_INT, TK_RUID, TK_REAL, TK_UNION, TK_RECORD
-<mult>: TK_DIV, TK_MUL
-<input_par>: TK_INPUT
-<stmt>: TK_READ, TK_WRITE, TK_CALL, TK_SQL, TK_WHILE, TK_ID, TK_IF
-<A>: TK_RECORD, TK_UNION
-<logicalOp>: TK_OR, TK_AND
-<declarations>: TK_TYPE, ∈
-<fieldDefinitions>: TK_RECORD, TK_TYPE, TK_UNION
-<dataType>: TK_REAL, TK_UNION, TK_RUID, TK_RECORD, TK_INT
-<var>: TK_NUM, TK_ID, TK_RNUM
-<remaining_list>: TK_COMMA, ∈
-<primitiveDatatype>: TK_REAL, TK_INT
-<conditionalStmt>: TK_IF
-<outputParameters>: ∈, TK_SQL
-<definitionOrTypedef>: TK_UNION, TK_RECORD, TK_DEFINETYPE
-<moreFields>: ∈, TK_RECORD, TK_TYPE, TK_UNION
-<declaration>: TK_TYPE
-<ioStmt>: TK_WRITE, TK_READ
-<booleanExpression>: TK_ID, TK_NUM, TK_RNUM, TK_OP, TK_NOT
-<handle_else>: TK_ENDIF, TK_ELSE
-<term>: TK_RNUM, TK_ID, TK_OP, TK_NUM
-<singleOrRecId>: TK_ID
-<output_par>: TK_OUTPUT, ∈
-<term'>: TK_MUL, ∈, TK_DIV
-<inputParameters>: TK_SQL
-<fieldDefinition>: TK_RECORD, TK_UNION, TK_TYPE
-<stmts>: TK_SQL, TK_DEFINETYPE, TK_RECORD, TK_WRITE, TK_UNION, TK_TYPE, TK_WHILE, TK_CALL, TK_ID, TK_RETURN, TK_IF, TK_READ
-<function>: TK_FUNID
-<optionalReturn>: ∈, TK_SQL
-<otherStmts>: TK_WRITE, TK_IF, TK_WHILE, TK_ID, TK_CALL, TK_READ, TK_SQL, ∈
-<returnStmt>: TK_RETURN
-<ifRecField>: ∈, TK_DOT
-<funCallStmt>: TK_SQL, TK_CALL
-<sum>: TK_PLUS, TK_MINUS
-<mainFunction>: TK_MAIN
-<typeDefinition>: TK_UNION, TK_RECORD
-<relationalOp>: TK_EQ, TK_NE, TK_LT, TK_GE, TK_LE
-<idList>: TK_ID
-<assignmentStmt>: TK_ID
-<global_or_not>: ∈, TK_COLON
-<program>: TK_MAIN, TK_FUNID
-<expression'>: TK_PLUS, TK_MINUS, ∈
+<program>:
+{TK_MAIN, TK_FUNID}
+{$}
 
-<iterativeStmt>: TK_CALL, TK_WRITE, TK_WHILE, TK_SQL, TK_IF, TK_ENDWHILE, TK_ELSE, TK_RETURN, TK_ID, TK_READ, TK_ENDIF
-<otherFunctions>: TK_MAIN
-<definetypestmt>: TK_SEM
-<arithmeticExpression>: TK_SEM, TK_CL
-<factor>: TK_PLUS, TK_DIV, TK_SEM, TK_MUL, TK_MINUS, TK_CL
-<more_ids>: TK_SQR
-<constructedDatatype>: TK_COLON, TK_ID
-<typeDefinitions>: TK_READ, TK_CALL, TK_WRITE, TK_ID, TK_WHILE, TK_RETURN, TK_TYPE, TK_SQL, TK_IF
-<parameter_list>: TK_SQR
-<mult>: TK_RNUM, TK_OP, TK_ID, TK_NUM
-<input_par>: TK_SEM, TK_OUTPUT
-<stmt>: TK_ENDWHILE, TK_ELSE, TK_READ, TK_WRITE, TK_IF, TK_CALL, TK_ENDIF, TK_SQL, TK_ID, TK_WHILE, TK_RETURN
-<A>: TK_RUID
-<logicalOp>: TK_OP
-<declarations>: TK_IF, TK_ID, TK_READ, TK_RETURN, TK_CALL, TK_WHILE, TK_SQL, TK_WRITE
-<fieldDefinitions>: TK_ENDRECORD, TK_ENDUNION
-<dataType>: TK_COLON, TK_ID
-<var>: TK_CL, TK_THEN, TK_DIV, TK_EQ, TK_MINUS, TK_PLUS, TK_LT, TK_LE, TK_SEM, TK_NE, TK_MUL, TK_GE
-<remaining_list>: TK_SQR
-<primitiveDatatype>: TK_ID, TK_COLON
-<conditionalStmt>: TK_IF, TK_RETURN, TK_WRITE, TK_ELSE, TK_WHILE, TK_SQL, TK_ID, TK_ENDIF, TK_READ, TK_CALL, TK_ENDWHILE
-<outputParameters>: TK_CALL
-<definitionOrTypedef>: TK_SEM
-<moreFields>: TK_ENDUNION, TK_ENDRECORD
-<declaration>: TK_WHILE, TK_RETURN, TK_SQL, TK_WRITE, TK_IF, TK_TYPE, TK_READ, TK_CALL, TK_ID
-<ioStmt>: TK_ID, TK_IF, TK_WRITE, TK_SQL, TK_CALL, TK_RETURN, TK_ENDWHILE, TK_READ, TK_ELSE, TK_WHILE, TK_ENDIF
-<booleanExpression>: TK_THEN, TK_CL
-<handle_else>: TK_WHILE, TK_WRITE, TK_SQL, TK_ID, TK_IF, TK_RETURN, TK_ENDWHILE, TK_ELSE, TK_READ, TK_ENDIF, TK_CALL
-<term>: TK_SEM, TK_CL, TK_MINUS, TK_PLUS
-<singleOrRecId>: TK_GE, TK_NE, TK_SEM, TK_LE, TK_THEN, TK_PLUS, TK_MUL, TK_DIV, TK_CL, TK_LT, TK_EQ, TK_ASSIGNOP, TK_MINUS
-<output_par>: TK_SEM
-<term'>: TK_SEM, TK_PLUS, TK_CL, TK_MINUS
-<inputParameters>: TK_SEM
-<fieldDefinition>: TK_ENDUNION, TK_UNION, TK_ENDRECORD, TK_RECORD, TK_TYPE
-<stmts>: TK_END
-<function>: TK_MAIN, TK_FUNID
-<optionalReturn>: TK_SEM
-<otherStmts>: TK_ENDWHILE, TK_ENDIF, TK_ELSE, TK_RETURN
-<returnStmt>: TK_END
-<ifRecField>: TK_MINUS, TK_ASSIGNOP, TK_DIV, TK_PLUS, TK_THEN, TK_LE, TK_NE, TK_MUL, TK_SEM, TK_CL, TK_EQ, TK_LT, TK_GE
-<funCallStmt>: TK_ID, TK_ENDWHILE, TK_WRITE, TK_CALL, TK_ENDIF, TK_SQL, TK_ELSE, TK_RETURN, TK_READ, TK_IF, TK_WHILE
-<sum>: TK_OP, TK_ID, TK_RNUM, TK_NUM
-<mainFunction>: $
-<typeDefinition>: TK_SEM
-<relationalOp>: TK_RNUM, TK_NUM, TK_ID
-<idList>: TK_SQR
-<assignmentStmt>: TK_READ, TK_WRITE, TK_SQL, TK_ENDIF, TK_CALL, TK_ELSE, TK_ENDWHILE, TK_WHILE, TK_ID, TK_RETURN, TK_IF
-<global_or_not>: TK_SEM
-<program>: $
-<expression'>: TK_CL, TK_SEM
+<mainFunction>:
+{TK_MAIN}
+{$}
+
+<otherFunctions>:
+{∈, TK_FUNID}
+{TK_MAIN}
+
+<function>:
+{TK_FUNID}
+{TK_MAIN, TK_FUNID}
+
+<input_par>:
+{TK_INPUT}
+{TK_OUTPUT, TK_SEM}
+
+<output_par>:
+{∈, TK_OUTPUT}
+{TK_SEM}
+
+<parameter_list>:
+{TK_RUID, TK_UNION, TK_INT, TK_RECORD, TK_REAL}
+{TK_SQR}
+
+<dataType>:
+{TK_UNION, TK_RUID, TK_REAL, TK_INT, TK_RECORD}
+{TK_ID, TK_COLON}
+
+<primitiveDatatype>:
+{TK_REAL, TK_INT}
+{TK_COLON, TK_ID}
+
+<constructedDatatype>:
+{TK_RECORD, TK_UNION, TK_RUID}
+{TK_COLON, TK_ID}
+
+<remaining_list>:
+{TK_COMMA, ∈}
+{TK_SQR}
+
+<stmts>:
+{TK_DEFINETYPE, TK_IF, TK_UNION, TK_SQL, TK_TYPE, TK_READ, TK_CALL, TK_WHILE, TK_RETURN, TK_ID, TK_WRITE, TK_RECORD}
+{TK_END}
+
+<typeDefinitions>:
+{TK_DEFINETYPE, ∈, TK_UNION, TK_RECORD}
+{TK_RETURN, TK_CALL, TK_READ, TK_WHILE, TK_ID, TK_TYPE, TK_IF, TK_WRITE, TK_SQL}
+
+<definitionOrTypedef>:
+{TK_UNION, TK_DEFINETYPE, TK_RECORD}
+{TK_SEM}
+
+<typeDefinition>:
+{TK_UNION, TK_RECORD}
+{TK_SEM}
+
+<fieldDefinitions>:
+{TK_UNION, TK_TYPE, TK_RECORD}
+{TK_ENDRECORD, TK_ENDUNION}
+
+<fieldDefinition>:
+{TK_UNION, TK_RECORD, TK_TYPE}
+{TK_TYPE, TK_RECORD, TK_ENDRECORD, TK_ENDUNION, TK_UNION}
+
+<moreFields>:
+{TK_RECORD, TK_TYPE, ∈, TK_UNION}
+{TK_ENDUNION, TK_ENDRECORD}
+
+<declarations>:
+{∈, TK_TYPE}
+{TK_WHILE, TK_CALL, TK_RETURN, TK_SQL, TK_ID, TK_WRITE, TK_READ, TK_IF}
+
+<declaration>:
+{TK_TYPE}
+{TK_TYPE, TK_WRITE, TK_READ, TK_IF, TK_SQL, TK_RETURN, TK_WHILE, TK_CALL, TK_ID}
+
+<global_or_not>:
+{∈, TK_COLON}
+{TK_SEM}
+
+<otherStmts>:
+{TK_WRITE, TK_IF, ∈, TK_SQL, TK_WHILE, TK_READ, TK_CALL, TK_ID}
+{TK_ENDWHILE, TK_RETURN, TK_ELSE, TK_ENDIF}
+
+<stmt>:
+{TK_READ, TK_WHILE, TK_ID, TK_IF, TK_WRITE, TK_CALL, TK_SQL}
+{TK_ID, TK_ELSE, TK_ENDIF, TK_SQL, TK_CALL, TK_ENDWHILE, TK_RETURN, TK_WHILE, TK_IF, TK_READ, TK_WRITE}
+
+<assignmentStmt>:
+{TK_ID}
+{TK_ENDWHILE, TK_ELSE, TK_RETURN, TK_IF, TK_ENDIF, TK_ID, TK_WRITE, TK_WHILE, TK_SQL, TK_CALL, TK_READ}
+
+<singleOrRecId>:
+{TK_ID}
+{TK_MUL, TK_LE, TK_SEM, TK_EQ, TK_PLUS, TK_NE, TK_LT, TK_GT, TK_DIV, TK_GE, TK_THEN, TK_ASSIGNOP, TK_CL, TK_MINUS}
+
+<ifRecField>:
+{TK_DOT, ∈}
+{TK_DIV, TK_SEM, TK_LE, TK_EQ, TK_PLUS, TK_MUL, TK_ASSIGNOP, TK_THEN, TK_GT, TK_LT, TK_MINUS, TK_GE, TK_CL, TK_NE}
+
+<funCallStmt>:
+{TK_CALL, TK_SQL}
+{TK_IF, TK_ID, TK_READ, TK_ELSE, TK_RETURN, TK_WRITE, TK_ENDWHILE, TK_ENDIF, TK_WHILE, TK_CALL, TK_SQL}
+
+<outputParameters>:
+{TK_SQL, ∈}
+{TK_CALL}
+
+<inputParameters>:
+{TK_SQL}
+{TK_SEM}
+
+<iterativeStmt>:
+{TK_WHILE}
+{TK_CALL, TK_IF, TK_ENDWHILE, TK_ENDIF, TK_WRITE, TK_ID, TK_WHILE, TK_RETURN, TK_ELSE, TK_SQL, TK_READ}
+
+<conditionalStmt>:
+{TK_IF}
+{TK_READ, TK_IF, TK_ELSE, TK_WRITE, TK_SQL, TK_RETURN, TK_ID, TK_CALL, TK_WHILE, TK_ENDWHILE, TK_ENDIF}
+
+<handle_else>:
+{TK_ENDIF, TK_ELSE}
+{TK_WRITE, TK_CALL, TK_ELSE, TK_SQL, TK_IF, TK_ENDWHILE, TK_RETURN, TK_ENDIF, TK_WHILE, TK_ID, TK_READ}
+
+<ioStmt>:
+{TK_READ, TK_WRITE}
+{TK_ENDIF, TK_SQL, TK_ID, TK_WHILE, TK_READ, TK_CALL, TK_WRITE, TK_RETURN, TK_ELSE, TK_ENDWHILE, TK_IF}
+
+<arithmeticExpression>:
+{TK_OP, TK_ID, TK_RNUM, TK_NUM}
+{TK_CL, TK_SEM}
+
+<expression'>:
+{∈, TK_PLUS, TK_MINUS}
+{TK_CL, TK_SEM}
+
+<term>:
+{TK_ID, TK_OP, TK_NUM, TK_RNUM}
+{TK_PLUS, TK_CL, TK_MINUS, TK_SEM}
+
+<term'>:
+{TK_MUL, ∈, TK_DIV}
+{TK_CL, TK_SEM, TK_MINUS, TK_PLUS}
+
+<factor>:
+{TK_ID, TK_OP, TK_RNUM, TK_NUM}
+{TK_CL, TK_SEM, TK_DIV, TK_MINUS, TK_MUL, TK_PLUS}
+
+<sum>:
+{TK_MINUS, TK_PLUS}
+{TK_NUM, TK_RNUM, TK_OP, TK_ID}
+
+<mult>:
+{TK_MUL, TK_DIV}
+{TK_NUM, TK_OP, TK_RNUM, TK_ID}
+
+<booleanExpression>:
+{TK_NUM, TK_ID, TK_RNUM, TK_OP, TK_NOT}
+{TK_CL, TK_THEN}
+
+<var>:
+{TK_NUM, TK_RNUM, TK_ID}
+{TK_MUL, TK_LE, TK_SEM, TK_DIV, TK_NE, TK_EQ, TK_MINUS, TK_PLUS, TK_THEN, TK_GT, TK_GE, TK_CL, TK_LT}
+
+<logicalOp>:
+{TK_AND, TK_OR}
+{TK_OP}
+
+<relationalOp>:
+{TK_GT, TK_LT, TK_NE, TK_EQ, TK_GE, TK_LE}
+{TK_RNUM, TK_NUM, TK_ID}
+
+<returnStmt>:
+{TK_RETURN}
+{TK_END}
+
+<optionalReturn>:
+{TK_SQL, ∈}
+{TK_SEM}
+
+<idList>:
+{TK_ID}
+{TK_SQR}
+
+<more_ids>:
+{TK_COMMA, ∈}
+{TK_SQR}
+
+<definetypestmt>:
+{TK_DEFINETYPE}
+{TK_SEM}
+
+<A>:
+{TK_RECORD, TK_UNION}
+{TK_RUID}
+

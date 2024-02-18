@@ -157,15 +157,74 @@ fn main() {
                 .and_modify(|v| v.last_mut().unwrap().push(word.to_string()));
         }
     }
-    for nt in &grammar.non_terminals {
-        println!("{}: {:?}", nt, first(&grammar, nt));
-    }
+    let mut non = vec![
+        "<program>",
+        "<mainFunction>",
+        "<otherFunctions>",
+        "<function>",
+        "<input_par>",
+        "<output_par>",
+        "<parameter_list>",
+        "<dataType>",
+        "<primitiveDatatype>",
+        "<constructedDatatype>",
+        "<remaining_list>",
+        "<stmts>",
+        "<typeDefinitions>",
+        "<definitionOrTypedef>",
+        "<typeDefinition>",
+        "<typeDefinition>",
+        "<fieldDefinitions>",
+        "<fieldDefinition>",
+        "<moreFields>",
+        "<declarations>",
+        "<declaration>",
+        "<global_or_not>",
+        "<otherStmts>",
+        "<stmt>",
+        "<assignmentStmt>",
+        "<singleOrRecId>",
+        "<ifRecField>",
+        "<funCallStmt>",
+        "<outputParameters>",
+        "<inputParameters>",
+        "<iterativeStmt>",
+        "<conditionalStmt>",
+        "<handle_else>",
+        "<ioStmt>",
+        "<arithmeticExpression>",
+        "<expression'>",
+        "<term>",
+        "<term'>",
+        "<factor>",
+        "<sum>",
+        "<mult>",
+        "<booleanExpression>",
+        "<booleanExpression>",
+        "<booleanExpression>",
+        "<var>",
+        "<logicalOp>",
+        "<relationalOp>",
+        "<returnStmt>",
+        "<optionalReturn>",
+        "<idList>",
+        "<more_ids>",
+        "<definetypestmt>",
+        "<A>",
+    ];
+    non.dedup();
     let mut track = HashSet::new();
-    println!();
-    for nt in &grammar.non_terminals {
-        print!("{}: ", nt);
-        println!("{:?}", follow(&grammar, &nt.to_string(), &mut track));
+    for nt in &non {
+        println!(
+            "{}",
+            format!(
+                "{}:\n{:?}\n{:?}\n",
+                nt,
+                first(&grammar, &nt.to_string()),
+                follow(&grammar, &nt.to_string(), &mut track)
+            )
+            .replace("\"", ""),
+        );
     }
-
     // check_ll1(&grammar);
 }
