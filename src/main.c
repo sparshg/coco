@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "first.h"
 #include "lexer.h"
 #include "lookup.h"
 #include "tokens.h"
@@ -23,5 +22,6 @@ int main(int argc, char* argv[]) {
         skip_whitespace(&str);
         // printf("After whitespace at %c (Hex: %x, Dec: %d, Diff: %ld)\n\n", *str, *str, *str, str - start);
     }
+
     return 0;
 }
