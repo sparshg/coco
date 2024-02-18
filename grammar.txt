@@ -33,7 +33,7 @@
 <handle_else> ===> TK_ENDIF | TK_ELSE <stmt> <otherStmts> TK_ENDIF
 <ioStmt> ===> TK_READ TK_OP <singleOrRecId> TK_CL TK_SEM | TK_WRITE TK_OP <singleOrRecId> TK_CL TK_SEM
 <arithmeticExpression> ===> <term> <expression'>
-<expression'> ==> <sum> <term> <expression'> | ∈
+<expression'> ===> <sum> <term> <expression'> | ∈
 <term> ===> <factor> <term'>
 <term'> ===> <mult> <factor> <term'> | ∈
 <factor> ===> TK_OP <arithmeticExpression> TK_CL | <var>

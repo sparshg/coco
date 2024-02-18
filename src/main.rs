@@ -75,6 +75,39 @@ fn follow(grammar: &Grammar, symbol: &String, track: &mut HashSet<String>) -> Ha
     result
 }
 
+// fn check_ll1(grammar: &Grammar) {
+//     for nt in grammar.rules.keys() {
+//         let mut contains = false;
+//         let mut dis = HashSet::new();
+//         for rule in &grammar.rules[nt] {
+//             let mut temp = HashSet::new();
+//             for q in rule {
+//                 let firstq = first(grammar, &q);
+//                 temp = temp.union(&firstq).cloned().collect();
+//                 if !firstq.contains("∈") {
+//                     temp.remove("∈");
+//                     break;
+//                 }
+//             }
+//             println!("{:?}", temp);
+//             if temp.contains("∈") {
+//                 contains = true;
+//                 continue;
+//             }
+//             dis = dis.intersection(&temp).cloned().collect();
+//         }
+//         if contains {
+//             let mut hashset = HashSet::new();
+//             dis = dis
+//                 .intersection(&follow(grammar, nt, &mut hashset))
+//                 .cloned()
+//                 .collect();
+//         }
+//         if !dis.is_empty() {
+//             println!("{} not LL1", nt);
+//         }
+//     }
+// }
 fn main() {
     let mut grammar = Grammar {
         start: String::new(),
@@ -133,4 +166,6 @@ fn main() {
         print!("{}: ", nt);
         println!("{:?}", follow(&grammar, &nt.to_string(), &mut track));
     }
+
+    // check_ll1(&grammar);
 }
