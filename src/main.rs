@@ -217,10 +217,16 @@ fn main() {
     for nt in &non {
         println!(
             "{}",
+            format!("{} = {:?}", nt, first(&grammar, &nt.to_string())).replace("\"", ""),
+        );
+    }
+    println!();
+    for nt in &non {
+        println!(
+            "{}",
             format!(
-                "{}:\n{:?}\n{:?}\n",
+                "{} = {:?}",
                 nt,
-                first(&grammar, &nt.to_string()),
                 follow(&grammar, &nt.to_string(), &mut track)
             )
             .replace("\"", ""),
