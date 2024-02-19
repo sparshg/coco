@@ -10,12 +10,12 @@
 <constructedDatatype> ===> TK_RECORD TK_RUID | TK_UNION TK_RUID | TK_RUID
 <remaining_list> ===> TK_COMMA <parameter_list> | ∈
 <stmts> ===> <typeDefinitions> <declarations> <otherStmts> <returnStmt>
-<typeDefinitions> ===> <definitionOrTypedef> TK_SEM <typeDefinitions> | ∈
+<typeDefinitions> ===> <definitionOrTypedef> <typeDefinitions> | ∈
 <definitionOrTypedef> ===> <definetypestmt> | <typeDefinition>
 <typeDefinition> ===> TK_RECORD TK_RUID <fieldDefinitions> TK_ENDRECORD
 <typeDefinition> ===> TK_UNION TK_RUID <fieldDefinitions> TK_ENDUNION
 <fieldDefinitions> ===> <fieldDefinition> <fieldDefinition> <moreFields>
-<fieldDefinition> ===> TK_TYPE <dataType> TK_COLON TK_FIELDID TK_SEM | <typeDefinition> TK_SEM
+<fieldDefinition> ===> TK_TYPE <dataType> TK_COLON TK_FIELDID TK_SEM
 <moreFields> ===> <fieldDefinition> <moreFields> | ∈
 <declarations> ===> <declaration> <declarations> | ∈
 <declaration> ===> TK_TYPE <dataType> TK_COLON TK_ID <global_or_not> TK_SEM
@@ -29,16 +29,16 @@
 <outputParameters> ===> TK_SQL <idList> TK_SQR TK_ASSIGNOP | ∈
 <inputParameters> ===> TK_SQL <idList> TK_SQR
 <iterativeStmt> ===> TK_WHILE TK_OP <booleanExpression> TK_CL <stmt> <otherStmts> TK_ENDWHILE
-<conditionalStmt> ===> TK_IF <booleanExpression> TK_THEN <stmt> <otherStmts> <handle_else>
+<conditionalStmt> ===> TK_IF TK_OP <booleanExpression> TK_CL TK_THEN <stmt> <otherStmts> <handle_else>
 <handle_else> ===> TK_ENDIF | TK_ELSE <stmt> <otherStmts> TK_ENDIF
 <ioStmt> ===> TK_READ TK_OP <singleOrRecId> TK_CL TK_SEM | TK_WRITE TK_OP <singleOrRecId> TK_CL TK_SEM
 <arithmeticExpression> ===> <term> <expression'>
-<expression'> ===> <sum> <term> <expression'> | ∈
+<expression'> ===> <sum_operators> <term> <expression'> | ∈
 <term> ===> <factor> <term'>
-<term'> ===> <mult> <factor> <term'> | ∈
+<term'> ===> <mult_operators> <factor> <term'> | ∈
 <factor> ===> TK_OP <arithmeticExpression> TK_CL | <var>
-<sum> ===> TK_PLUS | TK_MINUS
-<mult> ===> TK_MUL | TK_DIV
+<sum_operators> ===> TK_PLUS | TK_MINUS
+<mult_operators> ===> TK_MUL | TK_DIV
 <booleanExpression> ===> TK_OP <booleanExpression> TK_CL <logicalOp> TK_OP <booleanExpression> TK_CL
 <booleanExpression> ===> <var> <relationalOp> <var>
 <booleanExpression> ===> TK_NOT TK_OP <booleanExpression> TK_CL
