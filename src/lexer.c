@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "hashmap.h"
 #include "tokens.h"
 
 Token error() {
@@ -22,15 +23,14 @@ char current(char** str) {
 }
 
 void skip_whitespace(char** str) {
-    while (isspace(current(str)))
-        (*str)++;
+    while (isspace(current(str))) next(str);
 }
 
 Token try_special(char** str) {
     // % [ ] , ; : . ( ) + - * / ~
     // clang-format off
     switch (next(str)) {
-        case '%': { while (next(str) != '\n'); return TK_COMMENT; }
+        case '%': { while (next(str) != '\n') {}; return TK_COMMENT; }
         case '[': return TK_SQL;
         case ']': return TK_SQR;
         case ',': return TK_COMMA;
@@ -68,7 +68,7 @@ Token try_chained(char** str) {
                 return TK_AND;
         case '#':
             if (islower(next(str))) {
-                while (islower(current(str))) (*str)++;
+                while (islower(current(str))) next(str);
                 return TK_RUID;
             }
     }
@@ -80,7 +80,7 @@ Token try_number(char** str) {
     // [0-9][0-9]*[.][0-9][0-9]
     // [0-9][0-9]*[.][0-9][0-9][E][+|-|e][0-9][0-9]
     if (!isdigit(next(str))) return error();
-    while (isdigit(current(str))) (*str)++;
+    while (isdigit(current(str))) next(str);
     char* save = *str;
     if (next(str) == '.' && isdigit(next(str))) {
         if (!isdigit(next(str))) return error();
@@ -121,21 +121,27 @@ Token try_multipath(char** str) {
                 return TK_MAIN;
             *str = save;
             if (!isalpha(next(str))) return error();
-            while (isalpha(current(str))) (*str)++;
-            while (isdigit(current(str))) (*str)++;
+            while (isalpha(current(str))) next(str);
+            while (isdigit(current(str))) next(str);
             return TK_FUNID;
         }
     }
     return error();
 }
 
-Token try_id(char** str) {
+Token try_id(char** str, HASHMAP table) {
     // Anything starting with [a-z]
-    if (!isalpha(next(str))) return error();
+    if (!isalpha(current(str))) return error();
+    char* save = *str;
+    while (isalnum(current(str))) next(str);
+    int t;
+    if ((t = get(table, save, *str - save))) {
+        return t;
+    }
     return error();
 }
 
-Token try_all(char** str) {
+Token try_all(char** str, HASHMAP table) {
     // Try all tokens
     Token token = -1;
     char* save = *str;
@@ -147,7 +153,7 @@ Token try_all(char** str) {
     *str = save;
     if ((token = try_multipath(str)) != -1) return token;
     *str = save;
-    if ((token = try_id(str)) != -1) return token;
+    if ((token = try_id(str, table)) != -1) return token;
     *str = save;
     return error();
 }

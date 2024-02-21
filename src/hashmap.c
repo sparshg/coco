@@ -1,5 +1,5 @@
 
-#include "lookup.h"
+#include "hashmap.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,16 +7,16 @@
 
 #include "tokens.h"
 
-ENTRY create_entry(char* key, void* value) {
+ENTRY create_entry(char* key, int value) {
     ENTRY entry = malloc(sizeof(struct Entry));
-    entry->key = key;
+    entry->key = malloc(strlen(key) + 1);
+    strcpy(entry->key, key);
     entry->value = value;
     return entry;
 }
 
 void delete_entry(ENTRY entry) {
     free(entry->key);
-    free(entry->value);
     free(entry);
 }
 
@@ -36,18 +36,18 @@ void delete_hashmap(HASHMAP hashmap) {
     free(hashmap);
 }
 
-unsigned long hash(char* str) {
+unsigned long hash(char* str, int keylen) {
     unsigned long hash = 5381;
-    int c;
-    while (c = *str++)
-        hash = ((hash << 5) + hash) + c;
+    for (int i = 0; i < keylen; i++) {
+        hash = ((hash << 5) + hash) + *str++;
+    }
     return hash;
 }
 
-void* get(HASHMAP hashmap, char* key) {
-    unsigned long index = hash(key) % hashmap->capacity;
+int get(HASHMAP hashmap, char* key, int keylen) {
+    unsigned long index = hash(key, keylen) % hashmap->capacity;
     while (hashmap->entries[index] != NULL) {
-        if (strcmp(hashmap->entries[index]->key, key) == 0) {
+        if (strncmp(hashmap->entries[index]->key, key, keylen) == 0) {
             return hashmap->entries[index]->value;
         }
         index = (index + 1) % hashmap->capacity;
@@ -55,13 +55,13 @@ void* get(HASHMAP hashmap, char* key) {
     return NULL;
 }
 
-void insert(HASHMAP hashmap, char* key, void* value) {
+void insert(HASHMAP hashmap, char* key, int value) {
     if (hashmap->size >= hashmap->capacity) {
         printf("Hashmap overflowed\n");
         exit(1);
         return;
     }
-    unsigned long index = hash(key) % hashmap->capacity;
+    unsigned long index = hash(key, strlen(key)) % hashmap->capacity;
     while (hashmap->entries[index] != NULL) {
         index = (index + 1) % hashmap->capacity;
     }
@@ -69,8 +69,8 @@ void insert(HASHMAP hashmap, char* key, void* value) {
     hashmap->size++;
 }
 
-void remove_entry(HASHMAP hashmap, char* key) {
-    unsigned long index = hash(key) % hashmap->capacity;
+void delete(HASHMAP hashmap, char* key, int keylen) {
+    unsigned long index = hash(key, keylen) % hashmap->capacity;
     while (hashmap->entries[index] != NULL) {
         if (strcmp(hashmap->entries[index]->key, key) == 0) {
             delete_entry(hashmap->entries[index]);
@@ -82,10 +82,10 @@ void remove_entry(HASHMAP hashmap, char* key) {
     }
 }
 
-void print_hashmap(HASHMAP hashmap) {
+void print(HASHMAP hashmap) {
     for (int i = 0; i < hashmap->capacity; i++) {
         if (hashmap->entries[i] != NULL) {
-            printf("%s: %s\n", hashmap->entries[i]->key, hashmap->entries[i]->value);
+            printf("(%d) %s: %d\n", i, hashmap->entries[i]->key, hashmap->entries[i]->value);
         }
     }
 }

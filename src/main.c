@@ -2,17 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "hashmap.h"
 #include "lexer.h"
-#include "lookup.h"
 #include "tokens.h"
 
 int main(int argc, char* argv[]) {
-    char* str = "203\n203\n<--->===_hi%/_main([])>=#a00.00E+09 <--";
+    char* str = "203\n203\n<--->===_hi/_main([])>=#a00.00E+09 <--- with end hi ";
     char* start;
-
+    HASHMAP table = create_keyword_table();
     while (*str != '\0') {
         start = str;
-        int token = try_all(&str);
+        int token = try_all(&str, table);
         if (token == -1) {
             printf("Error at %c (Hex: %x, Dec: %d, Diff: %ld)\n", *str, *str, *str, str - start);
             break;
