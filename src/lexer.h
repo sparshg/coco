@@ -4,8 +4,8 @@
 
 void skip_whitespace(char** str);
 Token try_all(char** str, HASHMAP table);
-Token current(char** str);
-Token next(char** str);
+char current(char** str);
+char next(char** str);
 Token try_special(char** str);
 Token try_chained(char** str);
 Token try_id(char** str, HASHMAP table);

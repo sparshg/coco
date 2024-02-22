@@ -12,4 +12,11 @@
     "C_Cpp.clang_format_style": "file",
     "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}",
     "editor.formatOnSave": true,
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/Users/sparsh/Code/c/coco/target",
+            "binaryPath": "/Users/sparsh/Code/c/coco/target/program",
+            "binaryArgs": []
+        }
+    ],
 }

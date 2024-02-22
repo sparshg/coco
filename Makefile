@@ -8,10 +8,10 @@ OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(TARGET_DIR)/%.o,$(SRCS))
 default: run
 
 $(TARGET_DIR)/%.o: $(SRC_DIR)/%.c $(HEADERS)
-	@gcc -c $< -o $@
+	@gcc -g -c $< -o $@
 
 $(TARGET_DIR)/program: $(OBJECTS)
-	@gcc $(OBJECTS) -o $@
+	@gcc -g $(OBJECTS) -o $@
 
 build: $(TARGET_DIR)/program
 
