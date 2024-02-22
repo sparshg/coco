@@ -18,6 +18,7 @@ BUF read_file(char* filename) {
 BUF get_stream(FILE* fp) {
     BUF buf = malloc(sizeof(Buf));
     buf->curr = 0;
+    buf->next = 1;
     buf->ptr = 0;
     buf->f = fp;
     buf->st_ptr = 0;
@@ -36,11 +37,12 @@ char next(BUF buf) {
     if (buf->ptr++ == BUFSIZE - 1) {
         buf->curr = 1 - buf->curr;
         buf->ptr = 0;
-        if (buf->mode == READ || buf->curr == 1 - buf->save_stack[buf->st_ptr - 1][1]) {
+        if (buf->mode == READ || buf->curr == buf->next) {
             if (buf->save_stack[0][1] == buf->curr) {
                 perror("Cannot pop in future, consider increasing buffer size\n");
                 exit(1);
             }
+            buf->next = 1 - buf->next;
             buf->mode = READ;
             memset(buf->b[buf->curr], EOF, BUFSIZE);
             fread(buf->b[buf->curr], sizeof(char), BUFSIZE, buf->f);

@@ -15,8 +15,7 @@ typedef enum BufMode {
 
 typedef struct Buf {
     char b[2][BUFSIZE];
-    int curr;
-    int ptr;
+    int curr, next, ptr;
     FILE* f;
 
     // (ptr, curr)

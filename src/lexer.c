@@ -117,14 +117,18 @@ Token try_multipath(BUF b) {
 Token try_id(BUF b, HASHMAP table) {
     // Anything starting with [a-z]
     if (!isalpha(current(b))) return error();
-    int n = push_state(b);
-    while (isalnum(current(b))) next(b);
-    int t;
+    int n = push_state(b), t;
+    if (current(b) >= 'b' && next(b) <= 'd' && isdigit(next(b))) {
+        while (current(b) >= 'b' && current(b) <= 'd') next(b);
+        while (isdigit(current(b))) next(b);
+        return TK_ID;
+    }
+    while (isalpha(current(b))) next(b);
     char* str = string_from(b, n);
     if ((t = get(table, str, strlen(str)))) {
         return t;
     }
-    return error();
+    return TK_FIELDID;
 }
 
 Token try_all(BUF b, HASHMAP table) {
