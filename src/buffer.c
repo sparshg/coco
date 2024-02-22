@@ -36,7 +36,11 @@ char next(BUF buf) {
     if (buf->ptr++ == BUFSIZE - 1) {
         buf->curr = 1 - buf->curr;
         buf->ptr = 0;
-        if (buf->mode == READ || buf->curr == buf->save_stack[buf->st_ptr][1]) {
+        if (buf->mode == READ || buf->curr == 1 - buf->save_stack[buf->st_ptr - 1][1]) {
+            if (buf->save_stack[0][1] == buf->curr) {
+                perror("Cannot pop in future, consider increasing buffer size\n");
+                exit(1);
+            }
             buf->mode = READ;
             memset(buf->b[buf->curr], EOF, BUFSIZE);
             fread(buf->b[buf->curr], sizeof(char), BUFSIZE, buf->f);
@@ -47,13 +51,12 @@ char next(BUF buf) {
 
 char* string_from(BUF buf, int n) {
     char* str;
-    int len;
+    int len = buf->ptr + BUFSIZE - buf->save_stack[n][0];
     if (buf->save_stack[n][1] <= buf->curr) {
-        len = buf->ptr - buf->save_stack[n][0];
+        if (buf->save_stack[n][1] == buf->curr) len -= BUFSIZE;
         str = malloc((len + 1) * sizeof(char));
-        strncpy(str, &buf->b[buf->curr][buf->save_stack[n][0]], len);
+        strncpy(str, &buf->b[buf->save_stack[n][1]][buf->save_stack[n][0]], len);
     } else {
-        len = buf->ptr + BUFSIZE - buf->save_stack[n][0];
         str = malloc((len + 1) * sizeof(char));
         strncpy(str, &buf->b[1 - buf->curr][buf->save_stack[n][0]], BUFSIZE - buf->save_stack[n][0]);
         strncpy(str + BUFSIZE - buf->save_stack[n][0], &buf->b[buf->curr][0], buf->ptr);
@@ -65,7 +68,7 @@ char* string_from(BUF buf, int n) {
 // can retract at max BUFSIZE, else undefined behaviour
 int push_state(BUF buf) {
     if (buf->st_ptr == BUFSAVE) {
-        printf("Buffer save stack overflowed\n");
+        perror("Buffer save stack overflowed\n");
         exit(1);
     }
     buf->save_stack[buf->st_ptr][0] = buf->ptr;
@@ -75,7 +78,7 @@ int push_state(BUF buf) {
 
 void pop_state(BUF buf) {
     if (--buf->st_ptr < 0) {
-        printf("Buffer save stack underflow\n");
+        perror("Buffer save stack underflow\n");
         exit(1);
     }
     buf->ptr = buf->save_stack[buf->st_ptr][0];
@@ -88,7 +91,7 @@ void clear_saves(BUF buf) {
     buf->mode = READ;
 }
 
-void pop_till_nth(BUF buf, int n) {
+void pop_nth(BUF buf, int n) {
     buf->st_ptr = n;
     buf->ptr = buf->save_stack[buf->st_ptr][0];
     buf->curr = buf->save_stack[buf->st_ptr][1];

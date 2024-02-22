@@ -132,18 +132,18 @@ Token try_all(BUF b, HASHMAP table) {
     Token token = -1;
     int n = push_state(b);
     if ((token = try_special(b)) != -1) return token;
-    pop_till_nth(b, n);
+    pop_nth(b, n);
     push_state(b);
     if ((token = try_chained(b)) != -1) return token;
-    pop_till_nth(b, n);
+    pop_nth(b, n);
     push_state(b);
     if ((token = try_number(b)) != -1) return token;
-    pop_till_nth(b, n);
+    pop_nth(b, n);
     push_state(b);
     if ((token = try_multipath(b)) != -1) return token;
-    pop_till_nth(b, n);
+    pop_nth(b, n);
     push_state(b);
     if ((token = try_id(b, table)) != -1) return token;
-    pop_till_nth(b, n);
+    pop_nth(b, n);
     return error();
 }

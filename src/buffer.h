@@ -1,7 +1,7 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
-// should't be too less (> 32): refer push_state()
+// should't be too less (> 32)
 #define BUFSIZE 128
 
 #define BUFSAVE 10
@@ -34,7 +34,7 @@ char* string_from(BUF buf, int nth_save_earlier);
 void skip_whitespace(BUF buf);
 int push_state(BUF buf);
 void pop_state(BUF buf);
-void pop_till_nth(BUF buf, int n);
+void pop_nth(BUF buf, int n);
 void clear_saves(BUF buf);
 
 BUF read_file(char* filename);
