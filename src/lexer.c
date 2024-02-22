@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "buffer.h"
 #include "hashmap.h"
 #include "tokens.h"
 
@@ -10,27 +11,11 @@ Token error() {
     return -1;
 }
 
-char next(char** str) {
-    // Return current char, and move to next
-    // TODO: Handle EOF
-    return *((*str)++);
-}
-
-char current(char** str) {
-    // Return current char
-    // TODO: Handle EOF
-    return **str;
-}
-
-void skip_whitespace(char** str) {
-    while (isspace(current(str))) next(str);
-}
-
-Token try_special(char** str) {
+Token try_special(BUF b) {
     // % [ ] , ; : . ( ) + - * / ~
     // clang-format off
-    switch (next(str)) {
-        case '%': { while (next(str) != '\n') {}; return TK_COMMENT; }
+    switch (next(b)) {
+        case '%': { while (next(b) != '\n') {}; return TK_COMMENT; }
         case '[': return TK_SQL;
         case ']': return TK_SQR;
         case ',': return TK_COMMA;
@@ -49,111 +34,116 @@ Token try_special(char** str) {
     return error();
 }
 
-Token try_chained(char** str) {
+Token try_chained(BUF b) {
     Token token;
     // #[a-z][a-z]* &&& @@@ != ==
 
-    switch (next(str)) {
+    switch (next(b)) {
         case '!':
-            if (next(str) == '=')
+            if (next(b) == '=')
                 return TK_NE;
         case '=':
-            if (next(str) == '=')
+            if (next(b) == '=')
                 return TK_EQ;
         case '@':
-            if (next(str) == '@' && next(str) == '@')
+            if (next(b) == '@' && next(b) == '@')
                 return TK_OR;
         case '&':
-            if (next(str) == '&' && next(str) == '&' && next(str) == '&')
+            if (next(b) == '&' && next(b) == '&' && next(b) == '&')
                 return TK_AND;
         case '#':
-            if (islower(next(str))) {
-                while (islower(current(str))) next(str);
+            if (islower(next(b))) {
+                while (islower(current(b))) next(b);
                 return TK_RUID;
             }
     }
     return error();
 }
 
-Token try_number(char** str) {
+Token try_number(BUF b) {
     // [0-9][0-9]*
     // [0-9][0-9]*[.][0-9][0-9]
     // [0-9][0-9]*[.][0-9][0-9][E][+|-|e][0-9][0-9]
-    if (!isdigit(next(str))) return error();
-    while (isdigit(current(str))) next(str);
-    char* save = *str;
-    if (next(str) == '.' && isdigit(next(str))) {
-        if (!isdigit(next(str))) return error();
-        char* save2 = *str;
-        if (next(str) == 'E' && (next(str) == '+' || current(str) == '-') && isdigit(next(str)) && isdigit(next(str))) {
+    if (!isdigit(next(b))) return error();
+    while (isdigit(current(b))) next(b);
+    push_state(b);
+    if (next(b) == '.' && isdigit(next(b))) {
+        if (!isdigit(next(b))) return error();
+        push_state(b);
+        if (next(b) == 'E' && (next(b) == '+' || current(b) == '-') && isdigit(next(b)) && isdigit(next(b))) {
             return TK_RNUM;
         }
-        *str = save2;
+        pop_state(b);
         return TK_RNUM;
     }
-    *str = save;
+    pop_state(b);
     return TK_NUM;
 }
 
-Token try_multipath(char** str) {
+Token try_multipath(BUF b) {
     // < <= <--- > >= _main _[a-z|A-Z][a-z|A-Z]*[0-9]*
-    switch (next(str)) {
+    switch (next(b)) {
         case '<': {
-            char* save = *str;
-            if (next(str) == '=') return TK_LE;
-            if (current(str) == '-' && next(str) == '-') {
-                if (next(str) == '-')
+            push_state(b);
+            if (next(b) == '=') return TK_LE;
+            if (current(b) == '-' && next(b) == '-') {
+                if (next(b) == '-')
                     return TK_ASSIGNOP;
                 return error();
             }
-            *str = save;
+            pop_state(b);
             return TK_LT;
         }
         case '>': {
-            char* save = *str;
-            if (next(str) == '=') return TK_GE;
-            *str = save;
+            push_state(b);
+            if (next(b) == '=') return TK_GE;
+            pop_state(b);
             return TK_GT;
         }
         case '_': {
-            char* save = *str;
-            if (next(str) == 'm' && next(str) == 'a' && next(str) == 'i' && next(str) == 'n')
+            push_state(b);
+            if (next(b) == 'm' && next(b) == 'a' && next(b) == 'i' && next(b) == 'n')
                 return TK_MAIN;
-            *str = save;
-            if (!isalpha(next(str))) return error();
-            while (isalpha(current(str))) next(str);
-            while (isdigit(current(str))) next(str);
+            pop_state(b);
+            if (!isalpha(next(b))) return error();
+            while (isalpha(current(b))) next(b);
+            while (isdigit(current(b))) next(b);
             return TK_FUNID;
         }
     }
     return error();
 }
 
-Token try_id(char** str, HASHMAP table) {
+Token try_id(BUF b, HASHMAP table) {
     // Anything starting with [a-z]
-    if (!isalpha(current(str))) return error();
-    char* save = *str;
-    while (isalnum(current(str))) next(str);
+    if (!isalpha(current(b))) return error();
+    int n = push_state(b);
+    while (isalnum(current(b))) next(b);
     int t;
-    if ((t = get(table, save, *str - save))) {
+    char* str = string_from(b, n);
+    if ((t = get(table, str, strlen(str)))) {
         return t;
     }
     return error();
 }
 
-Token try_all(char** str, HASHMAP table) {
+Token try_all(BUF b, HASHMAP table) {
     // Try all tokens
     Token token = -1;
-    char* save = *str;
-    if ((token = try_special(str)) != -1) return token;
-    *str = save;
-    if ((token = try_chained(str)) != -1) return token;
-    *str = save;
-    if ((token = try_number(str)) != -1) return token;
-    *str = save;
-    if ((token = try_multipath(str)) != -1) return token;
-    *str = save;
-    if ((token = try_id(str, table)) != -1) return token;
-    *str = save;
+    int n = push_state(b);
+    if ((token = try_special(b)) != -1) return token;
+    pop_till_nth(b, n);
+    push_state(b);
+    if ((token = try_chained(b)) != -1) return token;
+    pop_till_nth(b, n);
+    push_state(b);
+    if ((token = try_number(b)) != -1) return token;
+    pop_till_nth(b, n);
+    push_state(b);
+    if ((token = try_multipath(b)) != -1) return token;
+    pop_till_nth(b, n);
+    push_state(b);
+    if ((token = try_id(b, table)) != -1) return token;
+    pop_till_nth(b, n);
     return error();
 }

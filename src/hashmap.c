@@ -59,7 +59,6 @@ void insert(HASHMAP hashmap, char* key, int value) {
     if (hashmap->size >= hashmap->capacity) {
         printf("Hashmap overflowed\n");
         exit(1);
-        return;
     }
     unsigned long index = hash(key, strlen(key)) % hashmap->capacity;
     while (hashmap->entries[index] != NULL) {

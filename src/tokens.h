@@ -76,7 +76,6 @@ enum Token {
     TK_RECORD,
     TK_ENDRECORD,
     TK_ELSE,
-
 };
 
 #endif

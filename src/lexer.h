@@ -2,14 +2,11 @@
 #define LEXER
 #include "tokens.h"
 
-void skip_whitespace(char** str);
-Token try_all(char** str, HASHMAP table);
-char current(char** str);
-char next(char** str);
-Token try_special(char** str);
-Token try_chained(char** str);
-Token try_id(char** str, HASHMAP table);
-Token try_number(char** str);
-Token try_multipath(char** str);
+Token try_all(BUF b, HASHMAP table);
+Token try_special(BUF b);
+Token try_chained(BUF b);
+Token try_id(BUF b, HASHMAP table);
+Token try_number(BUF b);
+Token try_multipath(BUF b);
 
 #endif

@@ -1,5 +1,6 @@
 #include "buffer.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,22 +20,81 @@ BUF get_stream(FILE* fp) {
     buf->curr = 0;
     buf->ptr = 0;
     buf->f = fp;
+    buf->st_ptr = 0;
+    buf->mode = READ;
     memset(buf->b[buf->curr], EOF, BUFSIZE);
     fread(buf->b[buf->curr], sizeof(char), BUFSIZE, fp);
     return buf;
 }
 
-// char current(BUF buf) {
-//     return buf->b[buf->curr][buf->ptr];
-// }
+char current(BUF buf) {
+    return buf->b[buf->curr][buf->ptr];
+}
 
-// char next(BUF buf) {
-//     char c = buf->b[buf->curr][buf->ptr];
-//     if (buf->ptr++ == BUFSIZE - 1) {
-//         buf->curr = 1 - buf->curr;
-//         buf->ptr = 0;
-//         memset(buf->b[buf->curr], EOF, BUFSIZE);
-//         fread(buf->b[buf->curr], sizeof(char), BUFSIZE, buf->f);
-//     }
-//     return c;
-// }
+char next(BUF buf) {
+    char c = buf->b[buf->curr][buf->ptr];
+    if (buf->ptr++ == BUFSIZE - 1) {
+        buf->curr = 1 - buf->curr;
+        buf->ptr = 0;
+        if (buf->mode == READ || buf->curr == buf->save_stack[buf->st_ptr][1]) {
+            buf->mode = READ;
+            memset(buf->b[buf->curr], EOF, BUFSIZE);
+            fread(buf->b[buf->curr], sizeof(char), BUFSIZE, buf->f);
+        }
+    }
+    return c;
+}
+
+char* string_from(BUF buf, int n) {
+    char* str;
+    int len;
+    if (buf->save_stack[n][1] <= buf->curr) {
+        len = buf->ptr - buf->save_stack[n][0];
+        str = malloc((len + 1) * sizeof(char));
+        strncpy(str, &buf->b[buf->curr][buf->save_stack[n][0]], len);
+    } else {
+        len = buf->ptr + BUFSIZE - buf->save_stack[n][0];
+        str = malloc((len + 1) * sizeof(char));
+        strncpy(str, &buf->b[1 - buf->curr][buf->save_stack[n][0]], BUFSIZE - buf->save_stack[n][0]);
+        strncpy(str + BUFSIZE - buf->save_stack[n][0], &buf->b[buf->curr][0], buf->ptr);
+    }
+    str[len] = '\0';
+    return str;
+}
+
+// can retract at max BUFSIZE, else undefined behaviour
+int push_state(BUF buf) {
+    if (buf->st_ptr == BUFSAVE) {
+        printf("Buffer save stack overflowed\n");
+        exit(1);
+    }
+    buf->save_stack[buf->st_ptr][0] = buf->ptr;
+    buf->save_stack[buf->st_ptr][1] = buf->curr;
+    return buf->st_ptr++;
+}
+
+void pop_state(BUF buf) {
+    if (--buf->st_ptr < 0) {
+        printf("Buffer save stack underflow\n");
+        exit(1);
+    }
+    buf->ptr = buf->save_stack[buf->st_ptr][0];
+    buf->curr = buf->save_stack[buf->st_ptr][1];
+    buf->mode = RETRACT;
+}
+
+void clear_saves(BUF buf) {
+    buf->st_ptr = 0;
+    buf->mode = READ;
+}
+
+void pop_till_nth(BUF buf, int n) {
+    buf->st_ptr = n;
+    buf->ptr = buf->save_stack[buf->st_ptr][0];
+    buf->curr = buf->save_stack[buf->st_ptr][1];
+    buf->mode = RETRACT;
+}
+
+void skip_whitespace(BUF buf) {
+    while (isspace(current(buf))) next(buf);
+}
