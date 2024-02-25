@@ -17,10 +17,12 @@ int main(int argc, char* argv[]) {
         int n = push_state(b);
         int token = try_all(b, table);
         if (token == -1) {
-            printf("Error at %c (Hex: %x, Dec: %d)\n", current(b), current(b), current(b));
+            printf("Unknown: %s\n", string_from(b, n));
+            // printf("Error at %c (Hex: %x, Dec: %d)\n", current(b), current(b), current(b));
             break;
+        } else {
+            printf("Found: %s, %s\n", token_to_string(token), string_from(b, n));
         }
-        printf("Found: %s, %s\n", token_to_string(token), string_from(b, n));
         // printf("Now at %c (Hex: %x, Dec: %d, Diff: %ld)\n", *str, *str, *str, str - start);
         skip_whitespace(b);
         // printf("After whitespace at %c (Hex: %x, Dec: %d, Diff: %ld)\n\n", *str, *str, *str, str - start);

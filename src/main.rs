@@ -26,8 +26,8 @@ fn first(grammar: &Grammar, symbol: &String) -> HashSet<String> {
         for q in rule {
             let firstq = first(grammar, q);
             temp = temp.union(&firstq).cloned().collect();
-            if !firstq.contains("∈") {
-                temp.remove("∈");
+            if !firstq.contains("#") {
+                temp.remove("#");
                 break;
             }
         }
@@ -49,9 +49,9 @@ fn follow(grammar: &Grammar, symbol: &String, track: &mut HashSet<String>) -> Ha
             for (i, q) in rule.iter().enumerate() {
                 if q == symbol {
                     let mut j = i;
-                    let mut temp = HashSet::from(["∈".to_string()]);
-                    while temp.contains("∈") {
-                        temp.remove("∈");
+                    let mut temp = HashSet::from(["#".to_string()]);
+                    while temp.contains("#") {
+                        temp.remove("#");
                         result = result.union(&temp).cloned().collect();
                         j += 1;
                         if j == rule.len() {
@@ -75,39 +75,6 @@ fn follow(grammar: &Grammar, symbol: &String, track: &mut HashSet<String>) -> Ha
     result
 }
 
-// fn check_ll1(grammar: &Grammar) {
-//     for nt in grammar.rules.keys() {
-//         let mut contains = false;
-//         let mut dis = HashSet::new();
-//         for rule in &grammar.rules[nt] {
-//             let mut temp = HashSet::new();
-//             for q in rule {
-//                 let firstq = first(grammar, &q);
-//                 temp = temp.union(&firstq).cloned().collect();
-//                 if !firstq.contains("∈") {
-//                     temp.remove("∈");
-//                     break;
-//                 }
-//             }
-//             println!("{:?}", temp);
-//             if temp.contains("∈") {
-//                 contains = true;
-//                 continue;
-//             }
-//             dis = dis.intersection(&temp).cloned().collect();
-//         }
-//         if contains {
-//             let mut hashset = HashSet::new();
-//             dis = dis
-//                 .intersection(&follow(grammar, nt, &mut hashset))
-//                 .cloned()
-//                 .collect();
-//         }
-//         if !dis.is_empty() {
-//             println!("{} not LL1", nt);
-//         }
-//     }
-// }
 fn main() {
     let mut grammar = Grammar {
         start: String::new(),
@@ -115,16 +82,14 @@ fn main() {
         non_terminals: HashSet::new(),
         rules: HashMap::new(),
     };
-    let filename = env::args().nth(1).unwrap_or("grammar.txt".to_string());
-    for line in std::fs::read_to_string(filename)
-        .expect("No such file")
-        .lines()
-    {
+    let file = std::fs::read_to_string(env::args().nth(1).unwrap_or("grammar.txt".to_string()))
+        .expect("No such file");
+    for line in file.lines() {
         if grammar.start.is_empty() {
             grammar.start = line.split_whitespace().next().unwrap().to_string();
         }
         let lhs = line.split_whitespace().next().unwrap();
-        if !lhs.starts_with('<') || !lhs.ends_with('>') {
+        if lhs.chars().next().unwrap().is_uppercase() {
             panic!("Invalid non-terminal: {} on LHS", lhs);
         }
         grammar.non_terminals.insert(lhs.to_string());
@@ -135,7 +100,7 @@ fn main() {
             .push(Vec::new());
         for word in line.split_whitespace().skip(1) {
             match word {
-                "===>" => continue,
+                "=" => continue,
                 "|" => {
                     grammar
                         .rules
@@ -146,7 +111,7 @@ fn main() {
                 }
                 _ => (),
             }
-            if line.starts_with('<') && word.ends_with('>') {
+            if word.chars().next().unwrap().is_lowercase() {
                 grammar.non_terminals.insert(word.to_string());
             } else {
                 grammar.terminals.insert(word.to_string());
@@ -157,80 +122,25 @@ fn main() {
                 .and_modify(|v| v.last_mut().unwrap().push(word.to_string()));
         }
     }
-    let mut non = vec![
-        "<program>",
-        "<mainFunction>",
-        "<otherFunctions>",
-        "<function>",
-        "<input_par>",
-        "<output_par>",
-        "<parameter_list>",
-        "<dataType>",
-        "<primitiveDatatype>",
-        "<constructedDatatype>",
-        "<remaining_list>",
-        "<stmts>",
-        "<typeDefinitions>",
-        "<definitionOrTypedef>",
-        "<typeDefinition>",
-        "<typeDefinition>",
-        "<fieldDefinitions>",
-        "<fieldDefinition>",
-        "<moreFields>",
-        "<declarations>",
-        "<declaration>",
-        "<global_or_not>",
-        "<otherStmts>",
-        "<stmt>",
-        "<assignmentStmt>",
-        "<singleOrRecId>",
-        "<ifRecField>",
-        "<funCallStmt>",
-        "<outputParameters>",
-        "<inputParameters>",
-        "<iterativeStmt>",
-        "<conditionalStmt>",
-        "<handle_else>",
-        "<ioStmt>",
-        "<arithmeticExpression>",
-        "<expression'>",
-        "<term>",
-        "<term'>",
-        "<factor>",
-        "<sum_operators>",
-        "<mult_operators>",
-        "<booleanExpression>",
-        "<booleanExpression>",
-        "<booleanExpression>",
-        "<var>",
-        "<logicalOp>",
-        "<relationalOp>",
-        "<returnStmt>",
-        "<optionalReturn>",
-        "<idList>",
-        "<more_ids>",
-        "<definetypestmt>",
-        "<A>",
-    ];
-    non.dedup();
+    dbg!(&grammar);
     let mut track = HashSet::new();
-    for nt in &non {
-        println!(
-            "{}",
-            format!("{} = {:?}", nt, first(&grammar, &nt.to_string())).replace("\"", ""),
-        );
-    }
-    println!();
-    for nt in &non {
+    for line in file.lines() {
         println!(
             "{}",
             format!(
-                "{} = {:?}",
-                nt,
-                follow(&grammar, &nt.to_string(), &mut track)
+                "{:?} {:?}",
+                // line,
+                first(
+                    &grammar,
+                    &line.split_whitespace().nth(2).unwrap().to_string()
+                ),
+                follow(
+                    &grammar,
+                    &line.split_whitespace().next().unwrap().to_string(),
+                    &mut track
+                )
             )
             .replace("\"", ""),
         );
     }
-    // check_ll1(&grammar);
 }
