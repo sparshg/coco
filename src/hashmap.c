@@ -52,7 +52,7 @@ int get(HASHMAP hashmap, char* key, int keylen) {
         }
         index = (index + 1) % hashmap->capacity;
     }
-    return NULL;
+    return -1;
 }
 
 void insert(HASHMAP hashmap, char* key, int value) {

@@ -6,7 +6,7 @@
 #include "hashmap.h"
 #include "lexer.h"
 #include "tokens.h"
-
+#include "parser.h"
 int main(int argc, char* argv[]) {
     BUF b = read_file("hi.txt");
 
@@ -27,6 +27,23 @@ int main(int argc, char* argv[]) {
         skip_whitespace(b);
         // printf("After whitespace at %c (Hex: %x, Dec: %d, Diff: %ld)\n\n", *str, *str, *str, str - start);
     }
+
+
+    // GrammarTable Testing Code
+    // HASHMAP grammarIndex = hash_symbols();
+    // int** grammar_rules = get_grammar_table();
+    // get_grammar_rules(grammar_rules, grammarIndex);
+
+    // for(int i=0; i<90; i++){
+    //     printf("%d ", i);
+    //     for(int j=0; j<15; j++){
+    //         if(grammar_rules[i][j] == -1)
+    //             continue;
+    //         printf("%d ", grammar_rules[i][j]);
+    //     }
+    //     printf("\n");
+    // }
+    
 
     return 0;
 }
