@@ -11,6 +11,7 @@ int main(int argc, char* argv[]) {
     BUF b = read_file("hi.txt");
 
     HASHMAP table = create_keyword_table();
+    HASHMAP symbol_map = create_symbol_map();
 
     // remove_comments("hi.txt", "clean.txt");
 
@@ -31,18 +32,18 @@ int main(int argc, char* argv[]) {
     }
 
     // GrammarTable Testing Code
-    HASHMAP symbol_map = create_symbol_map();
     int** grammar_rules = get_grammar_rules(symbol_map);
 
-    for (int i = 0; i < PROD_RULES_LEN; i++) {
-        // printf("%d ", i);
-        for (int j = 0; j < PROD_RULE_LINE_LEN; j++) {
-            if (grammar_rules[i][j] == -1)
-                break;
-            printf("%d ", grammar_rules[i][j]);
-        }
-        printf("\n");
-    }
+    // for (int i = 0; i < PROD_RULES_LEN; i++) {
+    // printf("%d ", i);
+    //     for (int j = 0; j < PROD_RULE_LINE_LEN; j++) {
+    //         if (grammar_rules[i][j] == -1)
+    //             break;
+    //         printf("%d ", grammar_rules[i][j]);
+    //     }
+    //     printf("\n");
+    // }
+    get_parse_table(grammar_rules, symbol_map);
 
     return 0;
 }

@@ -2,7 +2,7 @@
 #define BUFFER_H
 
 // should't be too less (> 32)
-#define BUFSIZE 128
+#define BUFSIZE 256
 
 #define BUFSAVE 10
 

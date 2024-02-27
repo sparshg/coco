@@ -1,5 +1,6 @@
 #include "tokens.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -13,15 +14,19 @@ HASHMAP create_keyword_table() {
     return table;
 }
 
-Token string_to_token(char* str) {
-    for (int i = 0; i < TOKENS_LEN; i++) {
-        if (strcmp(str, tokens[i]) == 0) {
-            return i;
-        }
+HASHMAP create_symbol_map() {
+    HASHMAP map = create_hashmap(1024);
+    for (int i = 0; i < SYMBOLS_LEN; i++) {
+        insert(map, (char*)symbols[i], i);
     }
-    return -1;
+    return map;
+}
+
+Token string_to_symbol(char* str, HASHMAP symbol_map) {
+    return get(symbol_map, str, strlen(str));
 }
 
 char* token_to_string(Token token) {
-    return (char*)tokens[token];
+    if (token < TOKENS_LEN) return (char*)keywords[token];
+    return 0;
 }

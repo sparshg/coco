@@ -128,7 +128,7 @@ fn main() {
         println!(
             "{}",
             format!(
-                "{:?} {:?}",
+                "{:?} : {:?}",
                 // line,
                 first(
                     &grammar,
@@ -140,7 +140,7 @@ fn main() {
                     &mut track
                 )
             )
-            .replace("\"", ""),
+            .replace(&['\"', ',', '{', '}'][..], "")
         );
     }
 }
