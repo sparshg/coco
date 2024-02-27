@@ -7,6 +7,8 @@ typedef enum Token Token;
 #define MAX_KEYWORD_LEN 30 + 1
 #define TOKENS_LEN 57
 #define KEYWORDS_LEN 28
+
+// includes $ and #
 #define SYMBOLS_LEN 109
 
 static const char keywords[][21] = {

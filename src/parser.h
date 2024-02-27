@@ -9,5 +9,6 @@
 int** create_parse_table();
 int** get_grammar_rules(HASHMAP grammarIndex);
 int** get_parse_table(int** grammar_rules, HASHMAP symbol_map);
+void print_parse_table(int** parse_table);
 
 #endif

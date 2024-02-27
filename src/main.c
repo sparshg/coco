@@ -43,7 +43,8 @@ int main(int argc, char* argv[]) {
     //     }
     //     printf("\n");
     // }
-    get_parse_table(grammar_rules, symbol_map);
+    int** parse_table = get_parse_table(grammar_rules, symbol_map);
+    print_parse_table(parse_table);
 
     return 0;
 }

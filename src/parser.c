@@ -59,9 +59,19 @@ int** create_parse_table() {
 }
 
 void print_parse_table(int** parse_table) {
+    printf("%23s ", " ");
+    for (int i = 0; i < TOKENS_LEN; i++) {
+        printf("%3.3s ", (symbols[i] + 3));
+    }
+    printf("  $\n");
     for (int i = 0; i < NT_LEN; i++) {
+        printf("%23s ", symbols[i + SYMBOLS_LEN - NT_LEN]);
         for (int j = 0; j < TOKENS_LEN + 1; j++) {
-            printf("%d ", parse_table[i][j]);
+            if (parse_table[i][j] == -1) {
+                printf("--- ");
+                continue;
+            }
+            printf("%3d ", parse_table[i][j] + 1);
         }
         printf("\n");
     }
