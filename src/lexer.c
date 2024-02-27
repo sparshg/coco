@@ -151,3 +151,31 @@ Token try_all(BUF b, HASHMAP table) {
     pop_nth(b, n);
     return error();
 }
+
+void remove_comments(char* testcaseFile, char* cleanFile) {
+    FILE *src_file, *dest_file;
+    char buffer[1024];
+
+    src_file = fopen(testcaseFile, "r");
+    dest_file = fopen(cleanFile, "w");
+
+    if (!src_file || !dest_file) {
+        printf("Error in Opening Files!\nComment Removal Aborted!\n");
+        exit(1);
+    }
+
+    while (fgets(buffer, 1024, src_file)) {
+        int i = 0;
+        while (buffer[i] != '\0') {
+            if (buffer[i] == '%') {
+                buffer[i] = '\0';
+                break;
+            }
+            i++;
+        }
+        printf("%s", buffer);
+        fprintf(dest_file, "%s", buffer);
+    }
+    fclose(src_file);
+    fclose(dest_file);
+}

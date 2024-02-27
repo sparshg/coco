@@ -4,7 +4,7 @@
 #include "hashmap.h"
 typedef enum Token Token;
 
-#define MAX_KEYWORD_LEN 20 + 1
+#define MAX_KEYWORD_LEN 30 + 1
 #define TOKENS_LEN 57
 #define KEYWORDS_LEN 28
 

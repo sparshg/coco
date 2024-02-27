@@ -1,19 +1,17 @@
+#include "parser.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "parser.h"
 
 const int NT_LEN = SYMBOLS_LEN - TOKENS_LEN;
 
-
-
-// Access row index in parse table by using GrammarIndex["NT_name"]
-HASHMAP hash_symbols(){
-    HASHMAP grammarIndex = create_hashmap(256);
+HASHMAP create_symbol_map() {
+    HASHMAP map = create_hashmap(1024);
     for (int i = 0; i < SYMBOLS_LEN; i++) {
-        insert(grammarIndex, symbols[i], i);
+        insert(map, (char*)symbols[i], i);
     }
-    return grammarIndex;
+    return map;
 }
 
 int** create_parse_table() {
@@ -27,41 +25,39 @@ int** create_parse_table() {
     return parse_table;
 }
 
-int** get_grammar_table(){
-    int** grammar_rules = (int**)malloc(PROD_RULE_LEN * sizeof(int*));
-    for(int i=0; i<PROD_RULE_LEN; i++){
-        grammar_rules[i] = (int*)malloc(15 * sizeof(int));
-        for(int j=0; j<15; j++){
+int** create_grammar_table() {
+    int** grammar_rules = (int**)malloc(PROD_RULES_LEN * sizeof(int*));
+    for (int i = 0; i < PROD_RULES_LEN; i++) {
+        grammar_rules[i] = (int*)malloc(PROD_RULE_LINE_LEN * sizeof(int));
+        for (int j = 0; j < PROD_RULE_LINE_LEN; j++) {
             grammar_rules[i][j] = -1;
         }
     }
     return grammar_rules;
 }
 
-
-
-void get_grammar_rules(int** grammar_rules, HASHMAP grammarIndex){
-    FILE* fd = fopen("grammar2.txt", "r");
-    if(fd == NULL){
+int** get_grammar_rules(HASHMAP symbol_map) {
+    int** grammar_rules = create_grammar_table();
+    FILE* fd = fopen("grammar.txt", "r");
+    if (fd == NULL) {
         printf("Error opening grammar file\n");
-        return;
+        exit(1);
     }
-    int RULE_SIZE=100;
+    int RULE_SIZE = 256;
     char line[RULE_SIZE];
     int row = 0;
-    char* delimiters[1] = { ' '};
-    while(fgets(line, RULE_SIZE, fd) != NULL){
+    while (fgets(line, RULE_SIZE, fd)) {
         int i = 0;
-        char* token = strtok(line, " \n");
-        while(token != NULL){
-            int symbolID = get(grammarIndex, token, strlen(token));
+        char* token = strtok(line, " =\n");
+        while (token != NULL) {
+            int symbolID = get(symbol_map, token, strlen(token));
+            // printf("%s:%d ", token, symbolID);
             grammar_rules[row][i++] = symbolID;
-            token = strtok(NULL, " \n");
+            token = strtok(NULL, " =\n");
         }
-        printf("\n");
+        // printf("\n");
         row++;
     }
     fclose(fd);
-    return;
+    return grammar_rules;
 }
-
