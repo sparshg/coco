@@ -51,11 +51,20 @@ int** create_parse_table() {
     for (int i = 0; i < NT_LEN; i++) {
         // TOKENS_LEN + 1 for $
         parse_table[i] = (int*)malloc((TOKENS_LEN + 1) * sizeof(int));
-        for (int j = 0; j < TOKENS_LEN; j++) {
+        for (int j = 0; j < TOKENS_LEN + 1; j++) {
             parse_table[i][j] = -1;
         }
     }
     return parse_table;
+}
+
+void print_parse_table(int** parse_table) {
+    for (int i = 0; i < NT_LEN; i++) {
+        for (int j = 0; j < TOKENS_LEN + 1; j++) {
+            printf("%d ", parse_table[i][j]);
+        }
+        printf("\n");
+    }
 }
 
 int** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
@@ -69,40 +78,42 @@ int** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
     char line[SIZE];
     int rule = 0;
     int epsilon = string_to_symbol("#", symbol_map);
-    printf("\n");
+    // printf("\n%d ", rule + 1);
     while (fgets(line, SIZE, fd)) {
         int can_eps = 0;
         char* token = strtok(line, " ");
         while (*token != ':') {
             int tokenID = string_to_symbol(token, symbol_map);
-            printf("%s[%d][%d] ", token, grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN, tokenID);
+            // printf("%s[%d][%d] ", token, grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN, tokenID);
             token = strtok(NULL, " ");
             if (tokenID == epsilon) {
                 can_eps = 1;
                 continue;
             }
-            parse_table[grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN][tokenID] = rule;
+            int* entry = &parse_table[grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN][tokenID];
+            if (*entry != -1) {
+                // printf("Not LL1\n");
+                exit(1);
+            }
+            *entry = rule;
         }
         token = strtok(NULL, " \n");
         if (can_eps) {
-            printf(": ");
+            // printf(": ");
             while (token != NULL) {
                 int tokenID = string_to_symbol(token, symbol_map);
-                printf("%s[%d][%d] ", token, grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN, tokenID);
+                // printf("%s[%d][%d] ", token, grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN, tokenID);
                 token = strtok(NULL, " \n");
-                parse_table[grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN][tokenID] = rule;
+                int* entry = &parse_table[grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN][tokenID];
+                if (*entry != -1) {
+                    printf("Not LL1\n");
+                    exit(1);
+                }
+                *entry = rule;
             }
         }
-        printf("\n");
         rule++;
-    }
-
-    // print parse table
-    for (int i = 0; i < NT_LEN; i++) {
-        for (int j = 0; j <= TOKENS_LEN; j++) {
-            printf("%d ", parse_table[i][j]);
-        }
-        printf("\n");
+        // printf("\n%d ", rule + 1);
     }
 
     fclose(fd);

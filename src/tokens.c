@@ -27,6 +27,5 @@ Token string_to_symbol(char* str, HASHMAP symbol_map) {
 }
 
 char* token_to_string(Token token) {
-    if (token < TOKENS_LEN) return (char*)keywords[token];
-    return 0;
+    return (char*)keywords[token];
 }

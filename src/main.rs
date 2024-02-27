@@ -130,10 +130,18 @@ fn main() {
             format!(
                 "{:?} : {:?}",
                 // line,
-                first(
-                    &grammar,
-                    &line.split_whitespace().nth(2).unwrap().to_string()
-                ),
+                {
+                    let mut temp = HashSet::new();
+                    for q in line.split_whitespace().skip(2) {
+                        let firstq = first(&grammar, &q.to_string());
+                        temp = temp.union(&firstq).cloned().collect();
+                        if !firstq.contains("#") {
+                            temp.remove("#");
+                            break;
+                        }
+                    }
+                    temp
+                },
                 follow(
                     &grammar,
                     &line.split_whitespace().next().unwrap().to_string(),
