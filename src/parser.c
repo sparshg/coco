@@ -31,7 +31,7 @@ int** get_grammar_rules(HASHMAP symbol_map) {
     char line[SIZE];
     int rule = 0;
     while (fgets(line, SIZE, fd)) {
-        int j = 0;
+        int j = 1;
         char* token = strtok(line, " =\n");
         while (token != NULL) {
             int symbolID = get(symbol_map, token, strlen(token));
@@ -40,6 +40,7 @@ int** get_grammar_rules(HASHMAP symbol_map) {
             token = strtok(NULL, " =\n");
         }
         // printf("\n");
+        grammar_rules[rule][0] = j - 1;
         rule++;
     }
     fclose(fd);
@@ -100,7 +101,7 @@ int** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
                 can_eps = 1;
                 continue;
             }
-            int* entry = &parse_table[grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN][tokenID];
+            int* entry = &parse_table[grammar_rules[rule][1] - SYMBOLS_LEN + NT_LEN][tokenID];
             if (*entry != -1) {
                 // printf("Not LL1\n");
                 exit(1);
@@ -114,9 +115,9 @@ int** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
                 int tokenID = string_to_symbol(token, symbol_map);
                 // printf("%s[%d][%d] ", token, grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN, tokenID);
                 token = strtok(NULL, " \n");
-                int* entry = &parse_table[grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN][tokenID];
+                int* entry = &parse_table[grammar_rules[rule][1] - SYMBOLS_LEN + NT_LEN][tokenID];
                 if (*entry != -1) {
-                    printf("Not LL1\n");
+                    // printf("Not LL1\n");
                     exit(1);
                 }
                 *entry = rule;
@@ -128,4 +129,13 @@ int** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
 
     fclose(fd);
     return parse_table;
+}
+
+void push_rule_to_stack(STACK stack, int** grammar_rules, HASHMAP symbol_map, int rule_no){
+    int* rule = grammar_rules[rule_no];
+
+    pop(stack);
+    for(int i=rule[0];i>1;i--){
+        push(stack, rule[i]);
+    }
 }

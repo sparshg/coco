@@ -20,6 +20,7 @@ void pop(STACK stack);
 int top(STACK stack);
 int isEmpty(STACK stack);
 int size(STACK stack);
+void printStack(STACK stack);
 
 
 #endif
