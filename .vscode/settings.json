@@ -8,7 +8,9 @@
         "first.h": "c",
         "lookup.h": "c",
         "hashmap.h": "c",
-        "sstream": "c"
+        "sstream": "c",
+        "queue": "c",
+        "stack": "c"
     },
     "C_Cpp.clang_format_style": "file",
     "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}",

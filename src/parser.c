@@ -61,7 +61,7 @@ void print_parse_table(int** parse_table) {
     for (int i = 0; i < TOKENS_LEN; i++) {
         printf("%3.3d ", i);
     }
-    printf(" 57\n", "$");
+    printf("057\n");
     printf("%23s ", " ");
     for (int i = 0; i < TOKENS_LEN; i++) {
         printf("%3.3s ", (symbols[i] + 3));
@@ -133,36 +133,35 @@ int** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
     return parse_table;
 }
 
-int isRuleNullable(int** grammar_rules, int rule_no, HASHMAP symbol_map){
-    if(grammar_rules[rule_no][0] == 2 && grammar_rules[rule_no][2] == string_to_symbol("#", symbol_map)){
+int isRuleNullable(int** grammar_rules, int rule_no, HASHMAP symbol_map) {
+    if (grammar_rules[rule_no][0] == 2 && grammar_rules[rule_no][2] == string_to_symbol("#", symbol_map)) {
         return 1;
     }
     return 0;
 }
 
-void push_rule_to_stack(STACK stack, int** grammar_rules, HASHMAP symbol_map, int rule_no){
-    if(isRuleNullable(grammar_rules, rule_no, symbol_map)){
+void push_rule_to_stack(STACK stack, int** grammar_rules, HASHMAP symbol_map, int rule_no) {
+    if (isRuleNullable(grammar_rules, rule_no, symbol_map)) {
         pop(stack);
         return;
     }
 
     int* rule = grammar_rules[rule_no];
     pop(stack);
-    for(int i=rule[0];i>1;i--){
+    for (int i = rule[0]; i > 1; i--) {
         push(stack, rule[i]);
     }
 }
 
-void initStack(STACK stack, HASHMAP symbol_map){
+void initStack(STACK stack, HASHMAP symbol_map) {
     push(stack, string_to_symbol("$", symbol_map));
     push(stack, string_to_symbol("program", symbol_map));
 }
 
-int isNonTerminal(int symbol){
+int isNonTerminal(int symbol) {
     return symbol >= SYMBOLS_LEN - NT_LEN;
 }
 
-int isEndSymbol(int symbol){
+int isEndSymbol(int symbol) {
     return symbol == TOKENS_LEN;
 }
-

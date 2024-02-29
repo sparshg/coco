@@ -1,7 +1,5 @@
 #include "stack.h"
 
-
-
 STACK createStack() {
     STACK stack = (STACK)malloc(sizeof(Stack));
     stack->data = (int*)malloc(sizeof(int) * MAX_STACK_SIZE);
@@ -18,7 +16,7 @@ int size(STACK stack) {
 }
 
 void push(STACK stack, int value) {
-    if(stack->top == MAX_STACK_SIZE - 1) {
+    if (stack->top == MAX_STACK_SIZE - 1) {
         printf("Stack Overflow\n");
         return;
     }
@@ -31,7 +29,7 @@ void pop(STACK stack) {
         printf("Stack Underflow\n");
         return;
     }
-    stack->data[stack->top--];
+    stack->top--;
     return;
 }
 
@@ -43,18 +41,15 @@ int top(STACK stack) {
     return stack->data[stack->top];
 }
 
-
-
-void printStack(STACK stack){
-    for(int i=0;i<=stack->top;i++){
-        printf("%d ",stack->data[i]);
+void printStack(STACK stack) {
+    for (int i = 0; i <= stack->top; i++) {
+        printf("%d ", stack->data[i]);
     }
     printf("<--TOP \n");
 }
 
-
 // int main() {
-//     STACK stack = createStack();    
+//     STACK stack = createStack();
 
 //     push(stack, 10);
 //     push(stack, 20);

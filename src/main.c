@@ -6,8 +6,8 @@
 #include "hashmap.h"
 #include "lexer.h"
 #include "parser.h"
-#include "tokens.h"
 #include "stack.h"
+#include "tokens.h"
 
 int main(int argc, char* argv[]) {
     remove_comments("t3.txt", "clean.txt");
@@ -30,11 +30,11 @@ int main(int argc, char* argv[]) {
     //     }
     //     printf("\n");
     // }
-    
 
     STACK stack = createStack();
     initStack(stack, symbol_map);
 
+    skip_whitespace(b);
     while (current(b) != EOF) {
         clear_saves(b);
         int n = push_state(b);
@@ -43,26 +43,26 @@ int main(int argc, char* argv[]) {
             printf("Unknown: %s\n", string_from(b, n));
             printf("LexError at %c (Hex: %x, Dec: %d)\n", current(b), current(b), current(b));
             break;
-        } 
-        
+        }
+
         else {
             printf("Found: %d %s, %s\n", token, token_to_string(token), string_from(b, n));
-            
+
             int topSymbol = top(stack);
             // printf("Top of Stack: %d\n", topSymbol);
-            if(topSymbol == string_to_symbol("$", symbol_map)){
+            if (topSymbol == string_to_symbol("$", symbol_map)) {
                 printf("Parsing Successful\n");
                 break;
             }
 
-            //First handle case to stop parsing when top of stack is $ and token is also $
+            // First handle case to stop parsing when top of stack is $ and token is also $
 
-            while(isNonTerminal(top(stack))){
+            while (isNonTerminal(top(stack))) {
                 topSymbol = top(stack);
                 int rule_no = parse_table[topSymbol - SYMBOLS_LEN + NT_LEN][token];
                 // printf("Row: %d\n", topSymbol  - SYMBOLS_LEN + NT_LEN);
                 // printf("Rule No: %d\n", rule_no);
-                if(rule_no == -1){
+                if (rule_no == -1) {
                     printf("ParseError at %c (Hex: %x, Dec: %d)\n", current(b), current(b), current(b));
                     break;
                 }
@@ -71,28 +71,23 @@ int main(int argc, char* argv[]) {
                 fprintf(fd, "Rule Used: %d\n", rule_no);
             }
 
-
             // printf("Now stack is: \n");
             // printStack(stack);
 
-
-            if(top(stack) == token){
+            if (top(stack) == token) {
                 printf("Matched: %s\n", token_to_string(token));
                 pop(stack);
             }
 
-
-            else{
+            else {
                 printf("SomeError at %c (Hex: %x, Dec: %d)\n", current(b), current(b), current(b));
                 break;
             }
-
         }
         // printf("Now at %c (Hex: %x, Dec: %d, Diff: %ld)\n", *str, *str, *str, str - start);
         skip_whitespace(b);
         // printf("After whitespace at %c (Hex: %x, Dec: %d, Diff: %ld)\n\n", *str, *str, *str, str - start);
     }
-
 
     closeFile(b);
     fclose(fd);

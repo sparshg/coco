@@ -49,7 +49,7 @@ Token try_chained(BUF b) {
             if (next(b) == '@' && next(b) == '@')
                 return TK_OR;
         case '&':
-            if (next(b) == '&' && next(b) == '&' && next(b) == '&')
+            if (next(b) == '&' && next(b) == '&')
                 return TK_AND;
         case '#':
             if (islower(next(b))) {
@@ -125,7 +125,7 @@ Token try_id(BUF b, HASHMAP table) {
     }
     while (isalpha(current(b))) next(b);
     char* str = string_from(b, n);
-    if ((t = get(table, str, strlen(str)))) {
+    if ((t = get(table, str, strlen(str))) != -1) {
         return t;
     }
     return TK_FIELDID;
