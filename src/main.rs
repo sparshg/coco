@@ -124,29 +124,31 @@ fn main() {
     }
     dbg!(&grammar);
     let mut track = HashSet::new();
+    let mut w = "Hi".to_string();
     for line in file.lines() {
+        if w == line.split_whitespace().next().unwrap().to_string() {
+            continue;
+        }
+        w = line.split_whitespace().next().unwrap().to_string();
         println!(
-            "{}",
+            "{} = {}",
+            w,
             format!(
                 "{:?} : {:?}",
-                // line,
-                {
-                    let mut temp = HashSet::new();
-                    for q in line.split_whitespace().skip(2) {
-                        let firstq = first(&grammar, &q.to_string());
-                        temp = temp.union(&firstq).cloned().collect();
-                        if !firstq.contains("#") {
-                            temp.remove("#");
-                            break;
-                        }
-                    }
-                    temp
-                },
-                follow(
-                    &grammar,
-                    &line.split_whitespace().next().unwrap().to_string(),
-                    &mut track
-                )
+                first(&grammar, &w.to_string()),
+                // {
+                //     let mut temp = HashSet::new();
+                //     for q in line.split_whitespace().skip(2) {
+                //         let firstq = first(&grammar, &q.to_string());
+                //         temp = temp.union(&firstq).cloned().collect();
+                //         if !firstq.contains("#") {
+                //             temp.remove("#");
+                //             break;
+                //         }
+                //     }
+                //     temp
+                // },
+                follow(&grammar, &w.to_string(), &mut track)
             )
             .replace(&['\"', ',', '{', '}'][..], "")
         );

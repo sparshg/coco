@@ -1,3 +1,5 @@
+#include "lexer.h"
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,10 +8,6 @@
 #include "buffer.h"
 #include "hashmap.h"
 #include "tokens.h"
-
-Token error() {
-    return -1;
-}
 
 Token try_special(BUF b) {
     // % [ ] , ; : . ( ) + - * / ~
@@ -31,7 +29,7 @@ Token try_special(BUF b) {
         case '~': return TK_NOT;
     }
     // clang-format on
-    return error();
+    return WRONG_PATH;
 }
 
 Token try_chained(BUF b) {
@@ -42,36 +40,43 @@ Token try_chained(BUF b) {
         case '!':
             if (next(b) == '=')
                 return TK_NE;
+            return WRONG_PATTERN;
         case '=':
             if (next(b) == '=')
                 return TK_EQ;
+            return WRONG_PATTERN;
         case '@':
             if (next(b) == '@' && next(b) == '@')
                 return TK_OR;
+            return WRONG_PATTERN;
         case '&':
             if (next(b) == '&' && next(b) == '&')
                 return TK_AND;
+            return WRONG_PATTERN;
         case '#':
             if (islower(next(b))) {
                 while (islower(current(b))) next(b);
                 return TK_RUID;
             }
+            return WRONG_PATTERN;
     }
-    return error();
+    return WRONG_PATH;
 }
 
 Token try_number(BUF b) {
     // [0-9][0-9]*
     // [0-9][0-9]*[.][0-9][0-9]
     // [0-9][0-9]*[.][0-9][0-9][E][+|-|e][0-9][0-9]
-    if (!isdigit(next(b))) return error();
+    if (!isdigit(next(b))) return WRONG_PATH;
     while (isdigit(current(b))) next(b);
     push_state(b);
     if (next(b) == '.' && isdigit(next(b))) {
-        if (!isdigit(next(b))) return error();
+        if (!isdigit(next(b))) return WRONG_PATTERN;
         push_state(b);
-        if (next(b) == 'E' && (next(b) == '+' || current(b) == '-') && isdigit(next(b)) && isdigit(next(b))) {
-            return TK_RNUM;
+        if (next(b) == 'E') {
+            if (current(b) == '+' || current(b) == '-') next(b);
+            if (isdigit(next(b)) && isdigit(next(b))) return TK_RNUM;
+            return WRONG_PATTERN;
         }
         pop_state(b);
         return TK_RNUM;
@@ -89,7 +94,7 @@ Token try_multipath(BUF b) {
             if (current(b) == '-' && next(b) == '-') {
                 if (next(b) == '-')
                     return TK_ASSIGNOP;
-                return error();
+                return WRONG_PATTERN;
             }
             pop_state(b);
             return TK_LT;
@@ -105,24 +110,42 @@ Token try_multipath(BUF b) {
             if (next(b) == 'm' && next(b) == 'a' && next(b) == 'i' && next(b) == 'n')
                 return TK_MAIN;
             pop_state(b);
-            if (!isalpha(next(b))) return error();
-            while (isalpha(current(b))) next(b);
-            while (isdigit(current(b))) next(b);
+            if (!isalpha(next(b))) return WRONG_PATTERN;
+            int len = 2;
+            while (isalpha(current(b))) {
+                next(b);
+                len++;
+            }
+            while (isdigit(current(b))) {
+                next(b);
+                len++;
+            }
+            if (len > 30) return FUN_LEN_EXCEED;
             return TK_FUNID;
         }
     }
-    return error();
+    return WRONG_PATH;
 }
 
 Token try_id(BUF b, HASHMAP table) {
     // Anything starting with [a-z]
-    if (!isalpha(current(b))) return error();
-    int n = push_state(b), t;
+    if (!isalpha(current(b))) return WRONG_PATH;
+    int t, len = 2;
+    push_state(b);
     if (current(b) >= 'b' && next(b) <= 'd' && isdigit(next(b))) {
-        while (current(b) >= 'b' && current(b) <= 'd') next(b);
-        while (isdigit(current(b))) next(b);
+        while (current(b) >= 'b' && current(b) <= 'd') {
+            next(b);
+            len++;
+        }
+        while (isdigit(current(b))) {
+            next(b);
+            len++;
+        }
+        if (len > 20) return VAR_LEN_EXCEED;
         return TK_ID;
     }
+    pop_state(b);
+    int n = push_state(b);
     while (isalpha(current(b))) next(b);
     char* str = string_from(b, n);
     if ((t = get(table, str, strlen(str))) != -1) {
@@ -133,23 +156,23 @@ Token try_id(BUF b, HASHMAP table) {
 
 Token try_all(BUF b, HASHMAP table) {
     // Try all tokens
-    Token token = -1;
+    Token token = WRONG_PATH;
     int n = push_state(b);
-    if ((token = try_special(b)) != -1) return token;
+    if ((token = try_special(b)) != WRONG_PATH) return token;
     pop_nth(b, n);
     push_state(b);
-    if ((token = try_chained(b)) != -1) return token;
+    if ((token = try_chained(b)) != WRONG_PATH) return token;
     pop_nth(b, n);
     push_state(b);
-    if ((token = try_number(b)) != -1) return token;
+    if ((token = try_number(b)) != WRONG_PATH) return token;
     pop_nth(b, n);
     push_state(b);
-    if ((token = try_multipath(b)) != -1) return token;
+    if ((token = try_multipath(b)) != WRONG_PATH) return token;
     pop_nth(b, n);
     push_state(b);
-    if ((token = try_id(b, table)) != -1) return token;
+    if ((token = try_id(b, table)) != WRONG_PATH) return token;
     pop_nth(b, n);
-    return error();
+    return WRONG_SYMBOL;
 }
 
 void remove_comments(char* testcaseFile, char* cleanFile) {
@@ -168,12 +191,12 @@ void remove_comments(char* testcaseFile, char* cleanFile) {
         int i = 0;
         while (buffer[i] != '\0') {
             if (buffer[i] == '%') {
-                buffer[i] = '\0';
+                buffer[i] = '\n';
+                buffer[i + 1] = '\0';
                 break;
             }
             i++;
         }
-        // printf("%s", buffer);
         fprintf(dest_file, "%s", buffer);
     }
     fclose(src_file);

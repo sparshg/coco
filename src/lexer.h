@@ -1,6 +1,16 @@
 #ifndef LEXER
 #define LEXER
+#include "buffer.h"
+#include "hashmap.h"
 #include "tokens.h"
+
+enum LexerError {
+    WRONG_PATTERN = -1,
+    WRONG_PATH = -2,
+    WRONG_SYMBOL = -3,
+    VAR_LEN_EXCEED = -4,
+    FUN_LEN_EXCEED = -5
+};
 
 Token try_all(BUF b, HASHMAP table);
 Token try_special(BUF b);

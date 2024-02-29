@@ -32,6 +32,19 @@ char current(BUF buf) {
     return buf->b[buf->curr][buf->ptr];
 }
 
+char back(BUF buf) {
+    if (buf->ptr-- == 0) {
+        if (buf->next == buf->curr) {
+            perror("Cannot go back, consider increasing buffer size\n");
+            exit(1);
+        }
+        buf->curr = 1 - buf->curr;
+        buf->ptr = BUFSIZE - 1;
+        buf->mode = RETRACT;
+    }
+    return buf->b[buf->curr][buf->ptr];
+}
+
 char next(BUF buf) {
     char c = buf->b[buf->curr][buf->ptr];
     if (buf->ptr++ == BUFSIZE - 1) {
@@ -67,7 +80,6 @@ char* string_from(BUF buf, int n) {
     return str;
 }
 
-// can retract at max BUFSIZE, else undefined behaviour
 int push_state(BUF buf) {
     if (buf->st_ptr == BUFSAVE) {
         perror("Buffer save stack overflowed\n");
@@ -100,11 +112,14 @@ void pop_nth(BUF buf, int n) {
     buf->mode = RETRACT;
 }
 
-void skip_whitespace(BUF buf) {
-    while (isspace(current(buf))) next(buf);
+int skip_whitespace(BUF buf) {
+    int n = 0;
+    while (isspace(current(buf))) {
+        if (next(buf) == '\n') n++;
+    }
+    return n;
 }
 
-
-void closeFile(BUF buf){
+void close_buf(BUF buf) {
     fclose(buf->f);
 }

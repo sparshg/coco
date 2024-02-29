@@ -14,9 +14,14 @@ typedef enum BufMode {
 } BufMode;
 
 typedef struct Buf {
-    char b[2][BUFSIZE];
-    int curr, next, ptr;
     FILE* f;
+    char b[2][BUFSIZE];
+
+    // current buffer, next buffer
+    int curr, next;
+
+    // current ptr
+    int ptr;
 
     // (ptr, curr)
     int save_stack[BUFSAVE][2];
@@ -28,14 +33,15 @@ typedef struct Buf* BUF;
 
 char next(BUF buf);
 char current(BUF buf);
+char back(BUF buf);
 char* string_from(BUF buf, int nth_save_earlier);
 
-void skip_whitespace(BUF buf);
+int skip_whitespace(BUF buf);
 int push_state(BUF buf);
 void pop_state(BUF buf);
 void pop_nth(BUF buf, int n);
 void clear_saves(BUF buf);
-void closeFile(BUF buf);
+void close_buf(BUF buf);
 
 BUF read_file(char* filename);
 BUF get_stream(FILE* fp);
