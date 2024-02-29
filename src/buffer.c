@@ -103,3 +103,8 @@ void pop_nth(BUF buf, int n) {
 void skip_whitespace(BUF buf) {
     while (isspace(current(buf))) next(buf);
 }
+
+
+void closeFile(BUF buf){
+    fclose(buf->f);
+}

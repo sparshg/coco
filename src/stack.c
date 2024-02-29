@@ -51,6 +51,8 @@ void printStack(STACK stack){
     }
     printf("<--TOP \n");
 }
+
+
 // int main() {
 //     STACK stack = createStack();    
 

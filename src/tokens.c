@@ -27,5 +27,5 @@ Token string_to_symbol(char* str, HASHMAP symbol_map) {
 }
 
 char* token_to_string(Token token) {
-    return (char*)keywords[token];
+    return (char*)symbols[token];
 }

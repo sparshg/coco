@@ -7,6 +7,7 @@ typedef enum Token Token;
 #define MAX_KEYWORD_LEN 30 + 1
 #define TOKENS_LEN 57
 #define KEYWORDS_LEN 28
+#define NT_LEN 50
 
 // includes $ and #
 #define SYMBOLS_LEN 109

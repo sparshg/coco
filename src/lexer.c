@@ -173,7 +173,7 @@ void remove_comments(char* testcaseFile, char* cleanFile) {
             }
             i++;
         }
-        printf("%s", buffer);
+        // printf("%s", buffer);
         fprintf(dest_file, "%s", buffer);
     }
     fclose(src_file);

@@ -35,6 +35,7 @@ int push_state(BUF buf);
 void pop_state(BUF buf);
 void pop_nth(BUF buf, int n);
 void clear_saves(BUF buf);
+void closeFile(BUF buf);
 
 BUF read_file(char* filename);
 BUF get_stream(FILE* fp);
