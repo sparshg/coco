@@ -102,7 +102,7 @@ void pop_state(BUF buf) {
 
 void clear_saves(BUF buf) {
     buf->st_ptr = 0;
-    buf->mode = READ;
+    // buf->mode = READ;
 }
 
 void pop_nth(BUF buf, int n) {
