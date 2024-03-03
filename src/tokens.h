@@ -6,10 +6,10 @@ typedef enum Token Token;
 
 #define TOKENS_LEN 57
 #define KEYWORDS_LEN 28
-#define NT_LEN 50
+#define NT_LEN 52
 
 // includes $ and #
-#define SYMBOLS_LEN 109
+#define SYMBOLS_LEN 111
 
 static const char keywords[][21] = {
     "with", "parameters", "end", "while", "union", "endunion", "definetype", "as", "type", "_main", "global", "parameter", "list", "input", "output", "int", "real", "endwhile", "if", "then", "endif", "read", "write", "return", "call", "record", "endrecord", "else"};
@@ -99,7 +99,9 @@ static const char symbols[][30] = {
     "stmt",
     "assignmentStmt",
     "singleOrRecId",
-    "ifRecField",
+    "option_single",
+    "oneExpansion",
+    "moreExpansion",
     "funCallStmt",
     "outputParameters",
     "inputParameters",

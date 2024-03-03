@@ -96,13 +96,12 @@ ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
     int epsilon = string_to_symbol("#", symbol_map);
     // printf("\n%d ", rule + 1);
 
-    // [--------------------|FIRST|FOLLOW]
     while (fgets(line, SIZE, fd)) {
         int can_eps = 0;
         char* token = strtok(line, " ");
         while (*token != ':') {
             int tokenID = string_to_symbol(token, symbol_map);
-            // printf("%s[%d][%d] ", token, grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN, tokenID);
+            // printf("%s[%d][%d] ", token, grammar_rules[rule][1] - SYMBOLS_LEN + NT_LEN, tokenID);
             token = strtok(NULL, " ");
             if (tokenID == epsilon) {
                 can_eps = 1;
@@ -121,7 +120,7 @@ ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
         // printf(": ");
         while (token != NULL) {
             int tokenID = string_to_symbol(token, symbol_map);
-            // printf("%s[%d][%d] ", token, grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN, tokenID);
+            // printf("%s[%d][%d] ", token, grammar_rules[rule][1] - SYMBOLS_LEN + NT_LEN, tokenID);
             token = strtok(NULL, " \n");
             ParseEntry* entry = &parse_table[grammar_rules[rule][1] - SYMBOLS_LEN + NT_LEN][tokenID];
             if (can_eps) {

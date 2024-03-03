@@ -1,22 +1,20 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "tokens.h"
 #include "stack.h"
+#include "tokens.h"
 
-#define PROD_RULES_LEN 90
+#define PROD_RULES_LEN 93
 #define PROD_RULE_LINE_LEN 12
 
 // -2 for $ and #
 // const int NT_LEN = SYMBOLS_LEN - TOKENS_LEN - 2;
 
-typedef struct ParseEntry{
+typedef struct ParseEntry {
     int rule_no;
     int isFirst;
     int isFollow;
 } ParseEntry;
-
-
 
 ParseEntry** create_parse_table();
 int** get_grammar_rules(HASHMAP grammarIndex);
