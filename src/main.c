@@ -11,12 +11,12 @@
 
 int main(int argc, char* argv[]) {
     // remove_comments("hi.txt", "clean.txt");
-    BUF b = read_file("t6.txt");
+    BUF b = read_file("t5.txt");
 
     HASHMAP table = create_keyword_table();
     HASHMAP symbol_map = create_symbol_map();
 
-    FILE* fd = fopen("ParsedTree.txt", "w");
+    // FILE* fd = fopen("ParsedTree.txt", "w");
 
     int** grammar_rules = get_grammar_rules(symbol_map);
     ParseEntry** parse_table = get_parse_table(grammar_rules, symbol_map);
@@ -27,9 +27,14 @@ int main(int argc, char* argv[]) {
     int line = 1;
     line += skip_whitespace(b);
 
+    int rules_used[500];
+    for(int i=0;i<500;i++){
+        rules_used[i]=-1;
+    }
+    int currentRule = 0;
+    printf("\n");
     // print_parse_table(parse_table);
 
-    int t = 0;
 
     while (current(b) != EOF) {
         clear_saves(b);
@@ -57,7 +62,8 @@ int main(int argc, char* argv[]) {
         }
 
         if (token == TK_COMMENT) {
-            // printf("Line no. %-3d Lexeme %-23s Token %s\n", line++, "%", token_to_string(token));
+            // printf("Line no. %-3d Lexeme %-23s Token %s\n", line, "%", token_to_string(token));
+            line++;
             line += skip_whitespace(b);
             continue;
         }
@@ -74,13 +80,16 @@ int main(int argc, char* argv[]) {
                 }
                 pop(stack);
                 goto label;
-            } else {
+            } 
+            else {
                 push_rule_to_stack(stack, grammar_rules, symbol_map, rule.rule_no);
+                // fprintf(fd, "Rule Used: %d and lexeme: %s\n", rule.rule_no, string_from(b, n));
+                rules_used[currentRule++] = rule.rule_no;
                 goto label;
             }
         } else {
             if (top(stack) == token) {
-                // printf("Matched: %s\n", token_to_string(token));
+                printf("Matched: %s\n", token_to_string(token));
                 pop(stack);
                 // t = 0;
             } else {
@@ -166,7 +175,7 @@ int main(int argc, char* argv[]) {
     }
 
     close_buf(b);
-    fclose(fd);
+    // fclose(fd);
 
     return 0;
 }

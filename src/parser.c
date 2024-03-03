@@ -72,12 +72,12 @@ void print_parse_table(ParseEntry** parse_table) {
     for (int i = 0; i < NT_LEN; i++) {
         printf("%23s ", symbols[i + SYMBOLS_LEN - NT_LEN]);
         for (int j = 0; j < TOKENS_LEN + 1; j++) {
-            if (parse_table[i][j].isFollow == 0) {
+            if (parse_table[i][j].rule_no == -1) {
                 printf("--- ");
                 continue;
             }
-            // printf("%3d ", parse_table[i][j].rule_no + 1);
-            printf("%3d ", parse_table[i][j].isFollow);
+            printf("%3d ", parse_table[i][j].rule_no + 1);
+            // printf("%3d ", parse_table[i][j].isFollow);
         }
         printf("\n");
     }
