@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 
     // print_parse_table(parse_table);
 
-    while (current(b) != EOF) {
+    lexer: while (current(b) != EOF) {
         clear_saves(b);
         int n = push_state(b);
         int token = try_all(b, table);
@@ -39,14 +39,14 @@ int main(int argc, char* argv[]) {
                     next(b);
                     break;
                 case VAR_LEN_EXCEED:
-                    // printf("Line no. %-3d Variable Identifier is longer than the prescribed length of 20 characters.\n", line);
+                    printf("Line no. %-3d Variable Identifier is longer than the prescribed length of 20 characters.\n", line);
                     break;
                 case FUN_LEN_EXCEED:
-                    // printf("Line no. %-3d Function Identifier is longer than the prescribed length of 30 characters.\n", line);
+                    printf("Line no. %-3d Function Identifier is longer than the prescribed length of 30 characters.\n", line);
                     break;
                 default:
                     back(b);
-                    // printf("Line no. %-3d Unknown %-22s\n", line, string_from(b, n));
+                    printf("Line no. %-3d Unknown %-22s\n", line, string_from(b, n));
                     break;
             }
             line += skip_whitespace(b);
@@ -63,13 +63,32 @@ int main(int argc, char* argv[]) {
         // printf("Top of Stack: %d\n", topSymbol);
 
         // First handle case to stop parsing when top of stack is $ and token is also $
-        label: while (is_non_terminal(top(stack))) {
+    label: while (is_non_terminal(top(stack))) {
             int rule_no = parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].rule_no;
-            // printf("Row: %d\n", topSymbol  - SYMBOLS_LEN + NT_LEN);
-            // printf("Rule No: %d\n", rule_no);
+
+
             if (rule_no == -1) {
-                printf("ParseError at %c (Hex: %x, Dec: %d)\n", current(b), current(b), current(b));
-                break;
+                // printf("ParseError at %c (Hex: %x, Dec: %d)\n", current(b), current(b), current(b));
+                // break;
+                printf("Line %d: Invalid token %s encountered with value %s stack top %s\n",line, token_to_string(token), string_from(b, n), symbols[top(stack)]);
+
+
+                while(!is_empty(stack) && !is_end_symbol(top(stack)) && is_non_terminal(top(stack))
+                                                                    && !parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFirst 
+                                                                    && !parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFollow) {
+                    pop(stack);
+                }
+                if(!is_non_terminal(top(stack))){
+                    break;
+                }
+                if(parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFirst){
+                    goto label;
+                }
+                else{
+                    pop(stack);
+                    goto label;
+                }
+                
             }
             push_rule_to_stack(stack, grammar_rules, symbol_map, rule_no);
             // printf("Rule Used: %d\n", rule_no);
@@ -85,7 +104,7 @@ int main(int argc, char* argv[]) {
         } else {
             // printf("I GIVE UP: Top of Stack: %s, Token: %s\n", symbols[top(stack)], token_to_string(token));
             // break;
-            printf("Error: The token %s for lexeme %s does not match with the expected token %s\n", token_to_string(token), string_from(b, n), token_to_string(top(stack)));
+            printf("Line %d: Error: The token %s for lexeme %s does not match with the expected token %s\n",line, token_to_string(token), string_from(b, n), token_to_string(top(stack)));
             // break;
             pop(stack);
             goto label;
