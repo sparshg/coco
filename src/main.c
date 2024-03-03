@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
             }
             push_rule_to_stack(stack, grammar_rules, symbol_map, rule_no);
             // printf("Rule Used: %d\n", rule_no);
-            fprintf(fd, "Rule Used: %d\n", rule_no);
+            fprintf(fd, "Rule Used: %d and lexeme: %s\n", rule_no, string_from(b, n));
         }
 
         // printf("Now stack is: \n");
