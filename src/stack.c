@@ -1,13 +1,13 @@
 #include "stack.h"
 
-STACK createStack() {
+STACK create_stack() {
     STACK stack = (STACK)malloc(sizeof(Stack));
     stack->data = (int*)malloc(sizeof(int) * MAX_STACK_SIZE);
     stack->top = -1;
     return stack;
 }
 
-int isEmpty(STACK stack) {
+int is_empty(STACK stack) {
     return stack->top == -1;
 }
 
@@ -25,7 +25,7 @@ void push(STACK stack, int value) {
 }
 
 void pop(STACK stack) {
-    if (isEmpty(stack)) {
+    if (is_empty(stack)) {
         printf("Stack Underflow\n");
         return;
     }
@@ -34,14 +34,14 @@ void pop(STACK stack) {
 }
 
 int top(STACK stack) {
-    if (isEmpty(stack)) {
+    if (is_empty(stack)) {
         printf("Stack is Empty!\n");
         return -1;
     }
     return stack->data[stack->top];
 }
 
-void printStack(STACK stack) {
+void print_stack(STACK stack) {
     for (int i = 0; i <= stack->top; i++) {
         printf("%d ", stack->data[i]);
     }

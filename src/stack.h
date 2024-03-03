@@ -14,13 +14,13 @@ typedef struct {
 
 typedef Stack* STACK;
 
-STACK createStack();
+STACK create_stack();
 void push(STACK stack, int value);
 void pop(STACK stack);
 int top(STACK stack);
-int isEmpty(STACK stack);
+int is_empty(STACK stack);
 int size(STACK stack);
-void printStack(STACK stack);
+void print_stack(STACK stack);
 
 
 #endif

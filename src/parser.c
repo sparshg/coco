@@ -44,19 +44,21 @@ int** get_grammar_rules(HASHMAP symbol_map) {
     return grammar_rules;
 }
 
-int** create_parse_table() {
-    int** parse_table = (int**)malloc(NT_LEN * sizeof(int*));
+ParseEntry** create_parse_table() {
+    ParseEntry** parse_table = (ParseEntry**)malloc(NT_LEN * sizeof(ParseEntry*));
     for (int i = 0; i < NT_LEN; i++) {
         // TOKENS_LEN + 1 for $
-        parse_table[i] = (int*)malloc((TOKENS_LEN + 1) * sizeof(int));
+        parse_table[i] = (ParseEntry*)malloc((TOKENS_LEN + 1) * sizeof(ParseEntry));
         for (int j = 0; j < TOKENS_LEN + 1; j++) {
-            parse_table[i][j] = -1;
+            parse_table[i][j].isFirst = 0;
+            parse_table[i][j].isFollow = 0;
+            parse_table[i][j].rule_no = -1;
         }
     }
     return parse_table;
 }
 
-void print_parse_table(int** parse_table) {
+void print_parse_table(ParseEntry** parse_table) {
     printf("%23s ", " ");
     for (int i = 0; i < TOKENS_LEN; i++) {
         printf("%3.3d ", i);
@@ -70,18 +72,19 @@ void print_parse_table(int** parse_table) {
     for (int i = 0; i < NT_LEN; i++) {
         printf("%23s ", symbols[i + SYMBOLS_LEN - NT_LEN]);
         for (int j = 0; j < TOKENS_LEN + 1; j++) {
-            if (parse_table[i][j] == -1) {
+            if (parse_table[i][j].isFollow == 0) {
                 printf("--- ");
                 continue;
             }
-            printf("%3d ", parse_table[i][j] + 1);
+            // printf("%3d ", parse_table[i][j].rule_no + 1);
+            printf("%3d ", parse_table[i][j].isFollow);
         }
         printf("\n");
     }
 }
 
-int** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
-    int** parse_table = create_parse_table();
+ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
+    ParseEntry** parse_table = create_parse_table();
     FILE* fd = fopen("firstfollow.txt", "r");
     if (fd == NULL) {
         printf("Error opening first and follow file\n");
@@ -92,6 +95,8 @@ int** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
     int rule = 0;
     int epsilon = string_to_symbol("#", symbol_map);
     // printf("\n%d ", rule + 1);
+
+    // [--------------------|FIRST|FOLLOW]
     while (fgets(line, SIZE, fd)) {
         int can_eps = 0;
         char* token = strtok(line, " ");
@@ -103,28 +108,32 @@ int** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
                 can_eps = 1;
                 continue;
             }
-            int* entry = &parse_table[grammar_rules[rule][1] - SYMBOLS_LEN + NT_LEN][tokenID];
-            if (*entry != -1) {
+            ParseEntry* entry = &parse_table[grammar_rules[rule][1] - SYMBOLS_LEN + NT_LEN][tokenID];
+            if (entry->rule_no != -1) {
                 // printf("Not LL1\n");
                 exit(1);
             }
-            *entry = rule;
+            entry->isFirst = 1;
+            entry->rule_no = rule;
         }
         token = strtok(NULL, " \n");
-        if (can_eps) {
-            // printf(": ");
-            while (token != NULL) {
-                int tokenID = string_to_symbol(token, symbol_map);
-                // printf("%s[%d][%d] ", token, grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN, tokenID);
-                token = strtok(NULL, " \n");
-                int* entry = &parse_table[grammar_rules[rule][1] - SYMBOLS_LEN + NT_LEN][tokenID];
-                if (*entry != -1) {
+        // if (can_eps) {
+        // printf(": ");
+        while (token != NULL) {
+            int tokenID = string_to_symbol(token, symbol_map);
+            // printf("%s[%d][%d] ", token, grammar_rules[rule][0] - SYMBOLS_LEN + NT_LEN, tokenID);
+            token = strtok(NULL, " \n");
+            ParseEntry* entry = &parse_table[grammar_rules[rule][1] - SYMBOLS_LEN + NT_LEN][tokenID];
+            if (can_eps) {
+                if (entry->rule_no != -1) {
                     // printf("Not LL1\n");
                     exit(1);
                 }
-                *entry = rule;
+                entry->rule_no = rule;
             }
+            entry->isFollow = 1;
         }
+        // }
         rule++;
         // printf("\n%d ", rule + 1);
     }
@@ -133,7 +142,7 @@ int** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
     return parse_table;
 }
 
-int isRuleNullable(int** grammar_rules, int rule_no, HASHMAP symbol_map) {
+int is_rule_nullable(int** grammar_rules, int rule_no, HASHMAP symbol_map) {
     if (grammar_rules[rule_no][0] == 2 && grammar_rules[rule_no][2] == string_to_symbol("#", symbol_map)) {
         return 1;
     }
@@ -141,7 +150,7 @@ int isRuleNullable(int** grammar_rules, int rule_no, HASHMAP symbol_map) {
 }
 
 void push_rule_to_stack(STACK stack, int** grammar_rules, HASHMAP symbol_map, int rule_no) {
-    if (isRuleNullable(grammar_rules, rule_no, symbol_map)) {
+    if (is_rule_nullable(grammar_rules, rule_no, symbol_map)) {
         pop(stack);
         return;
     }
@@ -153,15 +162,57 @@ void push_rule_to_stack(STACK stack, int** grammar_rules, HASHMAP symbol_map, in
     }
 }
 
-void initStack(STACK stack, HASHMAP symbol_map) {
+void init_stack(STACK stack, HASHMAP symbol_map) {
     push(stack, string_to_symbol("$", symbol_map));
     push(stack, string_to_symbol("program", symbol_map));
 }
 
-int isNonTerminal(int symbol) {
+int is_non_terminal(int symbol) {
     return symbol >= SYMBOLS_LEN - NT_LEN;
 }
 
-int isEndSymbol(int symbol) {
+int is_end_symbol(int symbol) {
     return symbol == TOKENS_LEN;
 }
+
+// int getSetTable() {
+//     int** symbolTable = (int**)malloc(NT_LEN * sizeof(int*));
+//     for (int i = 0; i < NT_LEN; i++) {
+//         symbolTable[i] = (int*)malloc(15 * sizeof(int));
+//         for (int j = 0; j < 15; j++) {
+//             symbolTable[i][j] = 0;
+//         }
+//     }
+//     return symbolTable;
+// }
+
+// void getFirstFollowSets(int** firstSets, int** followSets, HASHMAP symbol_map) {
+//     FILE* fd = fopen("firstfollowsets.txt", "r");
+
+//     char* token;
+//     const int BUFFER_SIZE = 200;
+//     char buffer[BUFFER_SIZE];
+
+//     while (fgets(buffer, BUFFER_SIZE, fd)) {
+//         // Get the non-terminal
+//         token = strtok(buffer, " =");
+
+//         int nonTerminal = get(symbol_map, token, strlen(token));
+
+//         // Get the first set till :
+//         token = strtok(NULL, " =\n");
+//         while (*token != ':') {
+//             printf("%s ", token);
+//             int terminal = get(symbol_map, token, strlen(token));
+//             firstSets[nonTerminal][terminal] = 1;
+//             token = strtok(NULL, " \n");
+//         }
+//         token = strtok(NULL, " \n");
+//         while (token) {
+//             printf("%s ", token);
+//             token = strtok(NULL, " \n");
+//         }
+//     }
+
+//     return;
+// }
