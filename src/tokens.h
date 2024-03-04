@@ -134,6 +134,8 @@ Token string_to_symbol(char* str, HASHMAP symbol_map);
 HASHMAP create_keyword_table();
 int is_non_terminal(int symbol);
 int is_end_symbol(int symbol);
+int rule_to_nt(int rule_no, int** grammar_rules);
+int symbol_to_nt(int symbol);
 
 enum Token {
     TK_ASSIGNOP,

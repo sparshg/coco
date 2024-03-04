@@ -81,7 +81,7 @@ void print_parse_table(ParseEntry** parse_table) {
     }
 }
 
-ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
+ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map, int* nullable_nt) {
     ParseEntry** parse_table = create_parse_table();
     FILE* fd = fopen("firstfollow.txt", "r");
     if (fd == NULL) {
@@ -99,15 +99,16 @@ ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
         char* token = strtok(line, " ");
         while (*token != ':') {
             int tokenID = string_to_symbol(token, symbol_map);
-            // printf("%s[%d][%d] ", token, grammar_rules[rule][1] - SYMBOLS_LEN + NT_LEN, tokenID);
+            // printf("%s[%d][%d] ", token, rule_to_nt(rule, grammar_rules), tokenID);
             token = strtok(NULL, " ");
             if (tokenID == epsilon) {
                 can_eps = 1;
+                nullable_nt[rule_to_nt(rule, grammar_rules)] = 1;
                 continue;
             }
-            ParseEntry* entry = &parse_table[grammar_rules[rule][1] - SYMBOLS_LEN + NT_LEN][tokenID];
+            ParseEntry* entry = &parse_table[rule_to_nt(rule, grammar_rules)][tokenID];
             if (entry->rule_no != -1) {
-                // printf("Not LL1\n");
+                printf("Not LL1\n");
                 exit(1);
             }
             entry->isFirst = 1;
@@ -118,12 +119,12 @@ ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
         // printf(": ");
         while (token != NULL) {
             int tokenID = string_to_symbol(token, symbol_map);
-            // printf("%s[%d][%d] ", token, grammar_rules[rule][1] - SYMBOLS_LEN + NT_LEN, tokenID);
+            // printf("%s[%d][%d] ", token, rule_to_nt(rule, grammar_rules), tokenID);
             token = strtok(NULL, " \n");
-            ParseEntry* entry = &parse_table[grammar_rules[rule][1] - SYMBOLS_LEN + NT_LEN][tokenID];
+            ParseEntry* entry = &parse_table[rule_to_nt(rule, grammar_rules)][tokenID];
             if (can_eps) {
                 if (entry->rule_no != -1) {
-                    // printf("Not LL1\n");
+                    printf("Not LL1\n");
                     exit(1);
                 }
                 entry->rule_no = rule;
@@ -139,15 +140,8 @@ ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
     return parse_table;
 }
 
-int is_rule_nullable(int** grammar_rules, int rule_no, HASHMAP symbol_map) {
-    if (grammar_rules[rule_no][0] == 2 && grammar_rules[rule_no][2] == string_to_symbol("#", symbol_map)) {
-        return 1;
-    }
-    return 0;
-}
-
 void push_rule_to_stack(STACK stack, int** grammar_rules, HASHMAP symbol_map, int rule_no) {
-    if (is_rule_nullable(grammar_rules, rule_no, symbol_map)) {
+    if (grammar_rules[rule_no][0] == 2 && grammar_rules[rule_no][2] == string_to_symbol("#", symbol_map)) {
         pop(stack);
         return;
     }
@@ -164,20 +158,9 @@ void init_stack(STACK stack, HASHMAP symbol_map) {
     push(stack, string_to_symbol("program", symbol_map));
 }
 
-int is_nt_nullable(int* nullable, int symbolId) {
-    for (int i = 0; i < 15; i++) {
-        if (nullable[i] == symbolId) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
-TREENODE parse_input_source_code(BUF b, HASHMAP keyword_table, HASHMAP symbol_map, int** grammar_rules, ParseEntry** parse_table) {
+TREENODE parse_input_source_code(BUF b, HASHMAP keyword_table, HASHMAP symbol_map, int** grammar_rules, ParseEntry** parse_table, int* nullable) {
     STACK stack = create_stack();
     init_stack(stack, symbol_map);
-
-    int nullable[] = {string_to_symbol("otherFunctions", symbol_map), string_to_symbol("output_par", symbol_map), string_to_symbol("remaining_list", symbol_map), string_to_symbol("typeDefinitions", symbol_map), string_to_symbol("moreFields", symbol_map), string_to_symbol("declarations", symbol_map), string_to_symbol("global_or_not", symbol_map), string_to_symbol("otherStmts", symbol_map), string_to_symbol("option_single", symbol_map), string_to_symbol("moreExpansion", symbol_map), string_to_symbol("outputParameters", symbol_map), string_to_symbol("expression'", symbol_map), string_to_symbol("term'", symbol_map), string_to_symbol("optionalReturn", symbol_map), string_to_symbol("more_ids", symbol_map)};
 
     int line = 1;
 
@@ -194,9 +177,9 @@ TREENODE parse_input_source_code(BUF b, HASHMAP keyword_table, HASHMAP symbol_ma
         if (top(stack) == string_to_symbol("$", symbol_map) || is_empty(stack))
             break;
         if (is_non_terminal(top(stack))) {
-            ParseEntry rule = parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token];
+            ParseEntry rule = parse_table[symbol_to_nt(top(stack))][token];
             if (rule.rule_no == -1) {
-                if (is_nt_nullable(nullable, top(stack))) {
+                if (nullable[symbol_to_nt(top(stack))]) {
                     pop(stack);
                     continue;
                 }

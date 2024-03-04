@@ -37,3 +37,11 @@ int is_non_terminal(int symbol) {
 int is_end_symbol(int symbol) {
     return symbol == TOKENS_LEN;
 }
+
+int rule_to_nt(int rule_no, int** grammar_rules) {
+    return grammar_rules[rule_no][1] - SYMBOLS_LEN + NT_LEN;
+}
+
+int symbol_to_nt(int symbol) {
+    return symbol - SYMBOLS_LEN + NT_LEN;
+}

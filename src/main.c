@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "buffer.h"
 #include "hashmap.h"
@@ -29,9 +30,9 @@ int main(int argc, char* argv[]) {
     //     printf("Usage: ./compiler <input_file> <parse_tree_out_file>\n");
     //     return 1;
     // }
-    // printf("=================================================================================\n");
-    // printf("--------------------------Welcome to CoCo Compiler v1.0--------------------------\n");
-    // printf("=================================================================================\n\n");
+    // printf("=========================================================================\n");
+    // printf("----------------------Welcome to CoCo Compiler v1.0----------------------\n");
+    // printf("===================================--====================================\n\n");
     // printf("Dear User,\n");
     // printf("This sophisticated compiler has been meticulously crafted to facilitate the compilation process of programs written in CoCo, ensuring precision, efficiency, and reliability.\n");
 
@@ -40,7 +41,8 @@ int main(int argc, char* argv[]) {
     HASHMAP keyword_table = create_keyword_table();
     HASHMAP symbol_map = create_symbol_map();
     int** grammar_rules = get_grammar_rules(symbol_map);
-    ParseEntry** parse_table = get_parse_table(grammar_rules, symbol_map);
+    int* nullable_nt = calloc(NT_LEN, sizeof(int));
+    ParseEntry** parse_table = get_parse_table(grammar_rules, symbol_map, nullable_nt);
 
     int option;
     TREENODE parseTree;
@@ -73,16 +75,26 @@ int main(int argc, char* argv[]) {
             break;
         }
         case 3: {
-            TREENODE parseTree = parse_input_source_code(b, keyword_table, symbol_map, grammar_rules, parse_table);
+            TREENODE parseTree = parse_input_source_code(b, keyword_table, symbol_map, grammar_rules, parse_table, nullable_nt);
 
-            printf("\n");
-            // printf("_______________________________________________________________________________________\n");
+            // printf("\n__________________________________________________________________________________\n");
             // printTree(parseTree, 1);
             break;
         }
-        case 4:
-            // print_total_time();
+        case 4: {
+            clock_t start_time, end_time;
+            double total_CPU_time, total_CPU_time_in_seconds;
+            start_time = clock();
+
+            parse_input_source_code(b, keyword_table, symbol_map, grammar_rules, parse_table, nullable_nt);
+
+            end_time = clock();
+            total_CPU_time = (double)(end_time - start_time);
+            total_CPU_time_in_seconds = total_CPU_time / CLOCKS_PER_SEC;
+            printf("\nTotal CPU Time: %lf\n", total_CPU_time);
+            printf("Total CPU Time: %lf sec\n", total_CPU_time_in_seconds);
             break;
+        }
         default:
             printf("Invalid option. Please choose again.\n");
             break;
