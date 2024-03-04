@@ -10,15 +10,6 @@
 #include "tokens.h"
 #include "tree.h"
 
-int checknull(int* nullable, int symbolId) {
-    for (int i = 0; i < 15; i++) {
-        if (nullable[i] == symbolId) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
 // int driver() {
 
 //     BUF b = read_file("t5.txt");
