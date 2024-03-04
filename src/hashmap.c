@@ -30,7 +30,8 @@ HASHMAP create_hashmap(int capacity) {
 
 void delete_hashmap(HASHMAP hashmap) {
     for (int i = 0; i < hashmap->size; i++) {
-        delete_entry(hashmap->entries[i]);
+        if (hashmap->entries[i] != NULL)
+            delete_entry(hashmap->entries[i]);
     }
     free(hashmap->entries);
     free(hashmap);

@@ -139,9 +139,6 @@ ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map) {
     return parse_table;
 }
 
-
-
-
 int is_rule_nullable(int** grammar_rules, int rule_no, HASHMAP symbol_map) {
     if (grammar_rules[rule_no][0] == 2 && grammar_rules[rule_no][2] == string_to_symbol("#", symbol_map)) {
         return 1;
@@ -176,19 +173,13 @@ int is_nt_nullable(int* nullable, int symbolId) {
     return 0;
 }
 
-
-
-TREENODE parse_input_source_code(char* testcasefile, HASHMAP table, HASHMAP symbol_map, int** grammar_rules, ParseEntry** parse_table){
-
-    BUF b = read_file(testcasefile);
+TREENODE parse_input_source_code(BUF b, HASHMAP keyword_table, HASHMAP symbol_map, int** grammar_rules, ParseEntry** parse_table) {
     STACK stack = create_stack();
     init_stack(stack, symbol_map);
 
     int nullable[] = {string_to_symbol("otherFunctions", symbol_map), string_to_symbol("output_par", symbol_map), string_to_symbol("remaining_list", symbol_map), string_to_symbol("typeDefinitions", symbol_map), string_to_symbol("moreFields", symbol_map), string_to_symbol("declarations", symbol_map), string_to_symbol("global_or_not", symbol_map), string_to_symbol("otherStmts", symbol_map), string_to_symbol("option_single", symbol_map), string_to_symbol("moreExpansion", symbol_map), string_to_symbol("outputParameters", symbol_map), string_to_symbol("expression'", symbol_map), string_to_symbol("term'", symbol_map), string_to_symbol("optionalReturn", symbol_map), string_to_symbol("more_ids", symbol_map)};
 
     int line = 1;
-    line += skip_whitespace(b);
-
 
     int rules_used[MAX_RULES_USED];
     for (int i = 0; i < MAX_RULES_USED; i++) {
@@ -196,95 +187,53 @@ TREENODE parse_input_source_code(char* testcasefile, HASHMAP table, HASHMAP symb
     }
 
     int rules_used_idx = 0;
+    int n;
 
+    Token token = get_next_token(b, keyword_table, &line, &n, 0);
     while (current(b) != EOF) {
-        clear_saves(b);
-        int n = push_state(b);
-        int token = get_next_token(b, table);
-        if (token < 0) {
-            switch (token) {
-                case WRONG_SYMBOL:
-                    printf("Line No. %-3d Error: Unknown symbol %c\n", line, current(b));
-                    next(b);
-                    break;
-                case VAR_LEN_EXCEED:
-                    printf("Line No. %-3d Error: Variable Identifier is longer than the prescribed length of 20 characters.\n", line);
-                    break;
-                case FUN_LEN_EXCEED:
-                    printf("Line No. %-3d Error: Function Identifier is longer than the prescribed length of 30 characters.\n", line);
-                    break;
-                default:
-                    back(b);
-                    printf("Line No. %-3d Error: Unknown pattern %s\n", line, string_from(b, n));
-                    break;
-            }
-            line += skip_whitespace(b);
-            continue;
-        }
-
-        if (token == TK_COMMENT) {
-            line++;
-            line += skip_whitespace(b);
-            continue;
-        }
-
-    label:
-        if(top(stack) == string_to_symbol("$", symbol_map) || is_empty(stack))
+        if (top(stack) == string_to_symbol("$", symbol_map) || is_empty(stack))
             break;
         if (is_non_terminal(top(stack))) {
             ParseEntry rule = parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token];
             if (rule.rule_no == -1) {
                 if (is_nt_nullable(nullable, top(stack))) {
                     pop(stack);
-                    goto label;
+                    continue;
                 }
-
-
                 printf("Line %-3d| Invalid token %s encountered with value %s stack top %s\n", line, token_to_string(token), string_from(b, n), symbols[top(stack)]);
 
                 if (!rule.isFollow) {
-                    line += skip_whitespace(b);
+                    token = get_next_token(b, keyword_table, &line, &n, 0);
                     continue;
                 }
                 pop(stack);
-                goto label;
             } else {
                 push_rule_to_stack(stack, grammar_rules, symbol_map, rule.rule_no);
                 rules_used[rules_used_idx++] = rule.rule_no;
-                goto label;
             }
-        }
-
-        else {
+        } else {
             if (top(stack) == token) {
                 // printf("Matched: %s\n", token_to_string(token));
                 pop(stack);
+                token = get_next_token(b, keyword_table, &line, &n, 0);
             } else {
                 printf("Line %-3d| Error: The token %s for lexeme %s does not match with the expected token %s\n", line, token_to_string(token), string_from(b, n), token_to_string(top(stack)));
                 pop(stack);
-                goto label;
             }
         }
-
-        line += skip_whitespace(b);
     }
-
-
 
     if (top(stack) == string_to_symbol("$", symbol_map)) {
         if (current(b) == EOF) {
             printf("Parsing Successful!\n");
         } else {
             printf("Parsing Error: Extra tokens after the end of the program.\n");
-        }    
-    }
-    
-    else {
+        }
+    } else {
         printf("Parsing Error: Some syntactical errors found.\n");
     }
 
     delete_stack(stack);
-    close_buf(b);
 
     printf("Constructing Parse Tree!\n");
     TREENODE parseTree = newNode(string_to_symbol("program", symbol_map));
@@ -293,9 +242,7 @@ TREENODE parse_input_source_code(char* testcasefile, HASHMAP table, HASHMAP symb
     printf("Parse Tree Constructed!\n");
 
     return parseTree;
-
 }
-
 
 // int getSetTable() {
 //     int** symbolTable = (int**)malloc(NT_LEN * sizeof(int*));
@@ -306,35 +253,4 @@ TREENODE parse_input_source_code(char* testcasefile, HASHMAP table, HASHMAP symb
 //         }
 //     }
 //     return symbolTable;
-// }
-
-// void getFirstFollowSets(int** firstSets, int** followSets, HASHMAP symbol_map) {
-//     FILE* fd = fopen("firstfollowsets.txt", "r");
-
-//     char* token;
-//     const int BUFFER_SIZE = 200;
-//     char buffer[BUFFER_SIZE];
-
-//     while (fgets(buffer, BUFFER_SIZE, fd)) {
-//         // Get the non-terminal
-//         token = strtok(buffer, " =");
-
-//         int nonTerminal = get(symbol_map, token, strlen(token));
-
-//         // Get the first set till :
-//         token = strtok(NULL, " =\n");
-//         while (*token != ':') {
-//             printf("%s ", token);
-//             int terminal = get(symbol_map, token, strlen(token));
-//             firstSets[nonTerminal][terminal] = 1;
-//             token = strtok(NULL, " \n");
-//         }
-//         token = strtok(NULL, " \n");
-//         while (token) {
-//             printf("%s ", token);
-//             token = strtok(NULL, " \n");
-//         }
-//     }
-
-//     return;
 // }

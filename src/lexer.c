@@ -159,7 +159,7 @@ Token try_id(BUF b, HASHMAP table) {
     return TK_FIELDID;
 }
 
-Token get_next_token(BUF b, HASHMAP table) {
+Token try_all(BUF b, HASHMAP table) {
     // Try all tokens
     Token token = WRONG_PATH;
     int n = push_state(b);
@@ -181,7 +181,7 @@ Token get_next_token(BUF b, HASHMAP table) {
 }
 
 void remove_comments(char* testcaseFile) {
-    FILE *src_file;
+    FILE* src_file;
     char buffer[1024];
 
     src_file = fopen(testcaseFile, "r");
@@ -206,51 +206,41 @@ void remove_comments(char* testcaseFile) {
     fclose(src_file);
 }
 
-void print_lexer_output(char* testcaseFile) {
-    BUF b = read_file(testcaseFile);
-    HASHMAP table = create_keyword_table();
-    printf("\n");
-    printf("_______________________________________________________________________________________\n");
+Token get_next_token(BUF b, HASHMAP keyword_table, int* line, int* last_state, int prints_output) {
     int token;
-    int line=1;
-    line += skip_whitespace(b);
-    while (current(b) != EOF) {
-        clear_saves(b);
-        int n = push_state(b);
-        token = get_next_token(b, table);
-    
+    *line += skip_whitespace(b);
+    if (current(b) == EOF) return REACHED_EOF;
+    clear_saves(b);
+    *last_state = push_state(b);
+    token = try_all(b, keyword_table);
 
-        if (token < 0) {
-            switch (token) {
-                case WRONG_SYMBOL:
-                    printf("Line No. %-3d| Error: Unknown symbol %c\n", line, current(b));
-                    next(b);
-                    break;
-                case VAR_LEN_EXCEED:
-                    printf("Line No. %-3d| Error: Variable Identifier is longer than the prescribed length of 20 characters.\n", line);
-                    break;
-                case FUN_LEN_EXCEED:
-                    printf("Line No. %-3d| Error: Function Identifier is longer than the prescribed length of 30 characters.\n", line);
-                    break;
-                default:
-                    back(b);
-                    printf("Line No. %-3d| Error: Unknown pattern %s\n", line, string_from(b, n));
-                    break;
-            }
-            line += skip_whitespace(b);
-            continue;
+    if (token < 0) {
+        switch (token) {
+            case WRONG_SYMBOL:
+                printf("Line %-3d| Error: Unknown symbol %c\n", *line, current(b));
+                next(b);
+                break;
+            case VAR_LEN_EXCEED:
+                printf("Line %-3d| Error: Variable Identifier is longer than the prescribed length of 20 characters.\n", *line);
+                break;
+            case FUN_LEN_EXCEED:
+                printf("Line %-3d| Error: Function Identifier is longer than the prescribed length of 30 characters.\n", *line);
+                break;
+            default:
+                back(b);
+                printf("Line %-3d| Error: Unknown pattern %s\n", *line, string_from(b, *last_state));
+                break;
         }
-
-        if (token == TK_COMMENT) {
-            printf("Line no. %-3d| Lexeme %-23s Token %s\n", line, "%", token_to_string(token));
-            line++;
-            line += skip_whitespace(b);
-            continue;
-        }
-        printf("Line no. %-3d| Lexeme %-23s Token %s\n", line, string_from(b, n), token_to_string(token));
-
-        line += skip_whitespace(b);
+        *line += skip_whitespace(b);
+        return get_next_token(b, keyword_table, line, last_state, prints_output);
     }
 
-    close_buf(b);
+    if (token == TK_COMMENT) {
+        if (prints_output) printf("Line %-3d| Lexeme %-23s Token %s\n", *line, "%", token_to_string(token));
+        (*line)++;
+        *line += skip_whitespace(b);
+        return get_next_token(b, keyword_table, line, last_state, prints_output);
+    }
+    if (prints_output) printf("Line %-3d| Lexeme %-23s Token %s\n", *line, string_from(b, *last_state), token_to_string(token));
+    return token;
 }
