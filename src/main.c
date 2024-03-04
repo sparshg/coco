@@ -55,17 +55,18 @@ int main(int argc, char* argv[]) {
         if (token < 0) {
             switch (token) {
                 case WRONG_SYMBOL:
+                    printf("Line %-3d| Unknown symbol %c\n", line, current(b));
                     next(b);
                     break;
                 case VAR_LEN_EXCEED:
-                    printf("Line no. %-3d Variable Identifier is longer than the prescribed length of 20 characters.\n", line);
+                    printf("Line %-3d| Variable Identifier is longer than the prescribed length of 20 characters.\n", line);
                     break;
                 case FUN_LEN_EXCEED:
-                    printf("Line no. %-3d Function Identifier is longer than the prescribed length of 30 characters.\n", line);
+                    printf("Line %-3d| Function Identifier is longer than the prescribed length of 30 characters.\n", line);
                     break;
                 default:
                     back(b);
-                    printf("Line no. %-3d Unknown %-22s\n", line, string_from(b, n));
+                    printf("Line %-3d| Unknown pattern %s\n", line, string_from(b, n));
                     break;
             }
             line += skip_whitespace(b);
@@ -90,7 +91,7 @@ int main(int argc, char* argv[]) {
                     pop(stack);
                     goto label;
                 }
-                printf("Line %d: Invalid token %s encountered with value %s stack top %s\n", line, token_to_string(token), string_from(b, n), symbols[top(stack)]);
+                printf("Line %-3d| Invalid token %s encountered with value %s stack top %s\n", line, token_to_string(token), string_from(b, n), symbols[top(stack)]);
 
                 // }
                 if (!rule.isFollow) {
@@ -111,85 +112,13 @@ int main(int argc, char* argv[]) {
             if (top(stack) == token) {
                 // printf("Matched: %s\n", token_to_string(token));
                 pop(stack);
-                // t = 0;
             } else {
-                // if (t == 0)
-                printf("Line %d: Error: The token %s for lexeme %s does not match with the expected token %s\n", line, token_to_string(token), string_from(b, n), token_to_string(top(stack)));
-                // t = 1;
+                printf("Line %-3d| Error: The token %s for lexeme %s does not match with the expected token %s\n", line, token_to_string(token), string_from(b, n), token_to_string(top(stack)));
                 pop(stack);
                 goto label;
             }
         }
 
-        // printf("Line no. %-3d Lexeme %-23s Token %s\n", line, string_from(b, n), token_to_string(token));
-
-        // First handle case to stop parsing when top of stack is $ and token is also $
-        // if(top(stack) == string_to_symbol("$", symbol_map)){
-        //     // printf("Parsing Successful\n");
-        //     break;
-        // }
-        // label:
-        //     while (is_non_terminal(top(stack))) {
-        //         int rule_no = parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].rule_no;
-
-        //         if (rule_no == -1) {
-        //             // printf("ParseError at %c (Hex: %x, Dec: %d)\n", current(b), current(b), current(b));
-        //             // break;
-        //             printf("Line %d: Invalid token %s encountered with value %s stack top %s\n", line, token_to_string(token), string_from(b, n), symbols[top(stack)]);
-
-        //             // if (parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFollow) {
-        //             //     pop(stack);
-        //             //     // goto label;
-        //             //     continue;
-        //             // }
-        //             // else {
-        //             //     // new_lexeme_req = 1;
-        //             //     line += skip_whitespace(b);
-        //             //     break;
-        //             // }
-
-        //             while (!is_empty(stack) && !is_end_symbol(top(stack)) && is_non_terminal(top(stack)) && !parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFirst && !parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFollow) {
-        //                 pop(stack);
-        //             }
-        //             if (!is_non_terminal(top(stack))) {
-        //                 break;
-        //             }
-        //             if (parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFirst) {
-        //                 goto label;
-        //             } else {
-        //                 pop(stack);
-        //                 goto label;
-        //             }
-        //         }
-        //         push_rule_to_stack(stack, grammar_rules, symbol_map, rule_no);
-        //         // printf("Rule Used: %d\n", rule_no);
-        //         fprintf(fd, "Rule Used: %d and lexeme: %s\n", rule_no, string_from(b, n));
-        //     }
-
-        //     // printf("Now stack is: \n");
-        //     // printStack(stack);
-
-        //     // if(new_lexeme_req == 1){
-        //     //     continue;
-        //     // }
-
-        //     // while (!is_non_terminal(top(stack))) {
-        //     if (top(stack) == token) {
-        //         // printf("Matched: %s\n", token_to_string(token));
-        //         pop(stack);
-
-        //         // break;
-        //     } else {
-        //         // printf("I GIVE UP: Top of Stack: %s, Token: %s\n", symbols[top(stack)], token_to_string(token));
-        //         // break;
-
-        //         printf("Line %d: Error: The token %s for lexeme %s does not match with the expected token %s\n", line, token_to_string(token), string_from(b, n), token_to_string(top(stack)));
-
-        //         // break;
-        //         pop(stack);
-        //         goto label;
-        //     }
-        //     // }
         line += skip_whitespace(b);
     }
 

@@ -120,9 +120,9 @@ Token try_multipath(BUF b) {
                 next(b);
                 len++;
             }
-            if (len > 30) 
+            if (len > 30)
                 return FUN_LEN_EXCEED;
-                // printf("Function Identifier is longer than the prescribed length of 30 characters.\n");
+            // printf("Function Identifier is longer than the prescribed length of 30 characters.\n");
             return TK_FUNID;
         }
     }
@@ -143,11 +143,12 @@ Token try_id(BUF b, HASHMAP table) {
             next(b);
             len++;
         }
-        if (len > 20) 
+        if (len > 20)
             return VAR_LEN_EXCEED;
-            // printf("Variable Identifier is longer than the prescribed length of 20 characters.\n");
+        // printf("Variable Identifier is longer than the prescribed length of 20 characters.\n");
         return TK_ID;
     }
+
     pop_state(b);
     int n = push_state(b);
     while (isalpha(current(b))) next(b);
