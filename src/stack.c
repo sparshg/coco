@@ -48,25 +48,7 @@ void print_stack(STACK stack) {
     printf("<--TOP \n");
 }
 
-// int main() {
-//     STACK stack = createStack();
-
-//     push(stack, 10);
-//     push(stack, 20);
-//     push(stack, 30);
-//     push(stack,40);
-//     push(stack,50);
-//     push(stack,60);
-
-//     printf("Top element: %d\n", top(stack));
-//     pop(stack);
-//     printf("Popped element: %d\n", top(stack));
-//     pop(stack);
-//     printf("Popped element: %d\n", top(stack));
-//     pop(stack);
-//     printf("Popped element: %d\n", top(stack));
-
-//     printf("Is stack empty? %s\n", isEmpty(stack) ? "Yes" : "No");
-
-//     return 0;
-// }
+void delete_stack(STACK stack) {
+    free(stack->data);
+    free(stack);
+}

@@ -21,6 +21,7 @@ int top(STACK stack);
 int is_empty(STACK stack);
 int size(STACK stack);
 void print_stack(STACK stack);
+void delete_stack(STACK stack);
 
 
 #endif

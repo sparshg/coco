@@ -12,12 +12,13 @@ enum LexerError {
     FUN_LEN_EXCEED = -5
 };
 
-Token try_all(BUF b, HASHMAP table);
+Token get_next_token(BUF b, HASHMAP table);
 Token try_special(BUF b);
 Token try_chained(BUF b);
 Token try_id(BUF b, HASHMAP table);
 Token try_number(BUF b);
 Token try_multipath(BUF b);
-void remove_comments(char* testcaseFile, char* cleanFile);
+void remove_comments(char* testcaseFile);
+void print_lexer_output(char* testcaseFile);
 
 #endif

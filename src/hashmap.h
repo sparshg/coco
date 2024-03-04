@@ -22,5 +22,6 @@ int get(HASHMAP hashmap, char* key, int keylen);
 void insert(HASHMAP hashmap, char* key, int value);
 void delete(HASHMAP hashmap, char* key, int keylen);
 void print(HASHMAP hashmap);
+void delete_hashmap(HASHMAP hashmap);
 
 #endif

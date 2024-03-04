@@ -159,7 +159,7 @@ Token try_id(BUF b, HASHMAP table) {
     return TK_FIELDID;
 }
 
-Token try_all(BUF b, HASHMAP table) {
+Token get_next_token(BUF b, HASHMAP table) {
     // Try all tokens
     Token token = WRONG_PATH;
     int n = push_state(b);
@@ -180,14 +180,13 @@ Token try_all(BUF b, HASHMAP table) {
     return WRONG_SYMBOL;
 }
 
-void remove_comments(char* testcaseFile, char* cleanFile) {
-    FILE *src_file, *dest_file;
+void remove_comments(char* testcaseFile) {
+    FILE *src_file;
     char buffer[1024];
 
     src_file = fopen(testcaseFile, "r");
-    dest_file = fopen(cleanFile, "w");
 
-    if (!src_file || !dest_file) {
+    if (!src_file) {
         printf("Error in Opening Files!\nComment Removal Aborted!\n");
         exit(1);
     }
@@ -202,8 +201,56 @@ void remove_comments(char* testcaseFile, char* cleanFile) {
             }
             i++;
         }
-        fprintf(dest_file, "%s", buffer);
+        printf("%s", buffer);
     }
     fclose(src_file);
-    fclose(dest_file);
+}
+
+void print_lexer_output(char* testcaseFile) {
+    BUF b = read_file(testcaseFile);
+    HASHMAP table = create_keyword_table();
+    printf("\n");
+    printf("_______________________________________________________________________________________\n");
+    int token;
+    int line=1;
+    line += skip_whitespace(b);
+    while (current(b) != EOF) {
+        clear_saves(b);
+        int n = push_state(b);
+        token = get_next_token(b, table);
+    
+
+        if (token < 0) {
+            switch (token) {
+                case WRONG_SYMBOL:
+                    printf("Line No. %-3d| Error: Unknown symbol %c\n", line, current(b));
+                    next(b);
+                    break;
+                case VAR_LEN_EXCEED:
+                    printf("Line No. %-3d| Error: Variable Identifier is longer than the prescribed length of 20 characters.\n", line);
+                    break;
+                case FUN_LEN_EXCEED:
+                    printf("Line No. %-3d| Error: Function Identifier is longer than the prescribed length of 30 characters.\n", line);
+                    break;
+                default:
+                    back(b);
+                    printf("Line No. %-3d| Error: Unknown pattern %s\n", line, string_from(b, n));
+                    break;
+            }
+            line += skip_whitespace(b);
+            continue;
+        }
+
+        if (token == TK_COMMENT) {
+            printf("Line no. %-3d| Lexeme %-23s Token %s\n", line, "%", token_to_string(token));
+            line++;
+            line += skip_whitespace(b);
+            continue;
+        }
+        printf("Line no. %-3d| Lexeme %-23s Token %s\n", line, string_from(b, n), token_to_string(token));
+
+        line += skip_whitespace(b);
+    }
+
+    close_buf(b);
 }

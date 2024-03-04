@@ -122,4 +122,5 @@ int skip_whitespace(BUF buf) {
 
 void close_buf(BUF buf) {
     fclose(buf->f);
+    free(buf);
 }
