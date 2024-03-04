@@ -9,9 +9,13 @@ typedef struct TreeNode* TREENODE;
 
 struct TreeNode{
     int symbolId;
-    int isLeaf;
+    // int isLeaf;
     TREENODE* children;
 };
+
+TREENODE newNode(int symbolId);
+void populateNode(TREENODE node, int* rules_used, int* rule_index, int** grammar_rules);
+void printTree(TREENODE node, int level);
 
 
 

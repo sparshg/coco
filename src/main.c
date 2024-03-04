@@ -8,15 +8,25 @@
 #include "parser.h"
 #include "stack.h"
 #include "tokens.h"
+#include "tree.h"
+
+int checknull(int* nullable, int symbolId) {
+    for (int i = 0; i < 15; i++) {
+        if (nullable[i] == symbolId) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 int main(int argc, char* argv[]) {
     // remove_comments("hi.txt", "clean.txt");
-    BUF b = read_file("t5.txt");
+    BUF b = read_file("t6.txt");
 
     HASHMAP table = create_keyword_table();
     HASHMAP symbol_map = create_symbol_map();
 
-    // FILE* fd = fopen("ParsedTree.txt", "w");
+    FILE* fd = fopen("ParsedTree.txt", "w");
 
     int** grammar_rules = get_grammar_rules(symbol_map);
     ParseEntry** parse_table = get_parse_table(grammar_rules, symbol_map);
@@ -27,14 +37,15 @@ int main(int argc, char* argv[]) {
     int line = 1;
     line += skip_whitespace(b);
 
-    int rules_used[500];
-    for(int i=0;i<500;i++){
-        rules_used[i]=-1;
-    }
-    int currentRule = 0;
-    printf("\n");
-    // print_parse_table(parse_table);
+    // int rules_used[500];
+    // for (int i = 0; i < 500; i++) {
+    //     rules_used[i] = -1;
+    // }
+    // int currentRule = 0;
 
+    int nullable[] = {string_to_symbol("otherFunctions", symbol_map), string_to_symbol("output_par", symbol_map), string_to_symbol("remaining_list", symbol_map), string_to_symbol("typeDefinitions", symbol_map), string_to_symbol("moreFields", symbol_map), string_to_symbol("declarations", symbol_map), string_to_symbol("global_or_not", symbol_map), string_to_symbol("otherStmts", symbol_map), string_to_symbol("option_single", symbol_map), string_to_symbol("moreExpansion", symbol_map), string_to_symbol("outputParameters", symbol_map), string_to_symbol("expression'", symbol_map), string_to_symbol("term'", symbol_map), string_to_symbol("optionalReturn", symbol_map), string_to_symbol("more_ids", symbol_map)};
+
+    // print_parse_table(parse_table);
 
     while (current(b) != EOF) {
         clear_saves(b);
@@ -67,29 +78,38 @@ int main(int argc, char* argv[]) {
             line += skip_whitespace(b);
             continue;
         }
+        // printf("Line no. %-3d Lexeme %-23s Token %s\n", line, string_from(b, n), token_to_string(token));
 
     label:
         if (is_non_terminal(top(stack))) {
             ParseEntry rule = parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token];
             if (rule.rule_no == -1) {
+                // if(parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFirst{
+                if (checknull(nullable, top(stack))) {
+                    // printf("Popped: %s\n", symbols[top(stack)]);
+                    pop(stack);
+                    goto label;
+                }
                 printf("Line %d: Invalid token %s encountered with value %s stack top %s\n", line, token_to_string(token), string_from(b, n), symbols[top(stack)]);
 
+                // }
                 if (!rule.isFollow) {
                     line += skip_whitespace(b);
                     continue;
                 }
                 pop(stack);
                 goto label;
-            } 
-            else {
+            } else {
                 push_rule_to_stack(stack, grammar_rules, symbol_map, rule.rule_no);
-                // fprintf(fd, "Rule Used: %d and lexeme: %s\n", rule.rule_no, string_from(b, n));
-                rules_used[currentRule++] = rule.rule_no;
+                fprintf(fd, "Rule Used: %d and lexeme: %s\n", rule.rule_no, string_from(b, n));
+                // rules_used[currentRule++] = rule.rule_no;
                 goto label;
             }
-        } else {
+        }
+
+        else {
             if (top(stack) == token) {
-                printf("Matched: %s\n", token_to_string(token));
+                // printf("Matched: %s\n", token_to_string(token));
                 pop(stack);
                 // t = 0;
             } else {
@@ -100,82 +120,98 @@ int main(int argc, char* argv[]) {
                 goto label;
             }
         }
+
         // printf("Line no. %-3d Lexeme %-23s Token %s\n", line, string_from(b, n), token_to_string(token));
 
         // First handle case to stop parsing when top of stack is $ and token is also $
-        // while (is_non_terminal(top(stack))) {
-        //     int rule_no = parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].rule_no;
-
-        //     if (rule_no == -1) {
-        //         // printf("ParseError at %c (Hex: %x, Dec: %d)\n", current(b), current(b), current(b));
-        //         // break;
-        //         printf("Line %d: Invalid token %s encountered with value %s stack top %s\n", line, token_to_string(token), string_from(b, n), symbols[top(stack)]);
-
-        //         if (parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFollow) {
-        //             pop(stack);
-        //             // goto label;
-        //             continue;
-        //         }
-        //         // while(!is_empty(stack) && !is_end_symbol(top(stack)) && is_non_terminal(top(stack))
-        //         //                                                     && !parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFirst
-        //         //                                                     && !parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFollow) {
-        //         //     pop(stack);
-        //         // }
-        //         // if(!is_non_terminal(top(stack))){
-        //         //     break;
-        //         // }
-        //         // if(parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFirst){
-        //         //     goto label;
-        //         // }
-        //         // else{
-        //         //     pop(stack);
-        //         //     goto label;
-        //         // }
-
-        //         else {
-        //             // new_lexeme_req = 1;
-        //             line += skip_whitespace(b);
-        //             break;
-        //         }
-        //     }
-        //     push_rule_to_stack(stack, grammar_rules, symbol_map, rule_no);
-        //     // printf("Rule Used: %d\n", rule_no);
-        //     fprintf(fd, "Rule Used: %d and lexeme: %s\n", rule_no, string_from(b, n));
+        // if(top(stack) == string_to_symbol("$", symbol_map)){
+        //     // printf("Parsing Successful\n");
+        //     break;
         // }
+        // label:
+        //     while (is_non_terminal(top(stack))) {
+        //         int rule_no = parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].rule_no;
 
-        // // printf("Now stack is: \n");
-        // // printStack(stack);
+        //         if (rule_no == -1) {
+        //             // printf("ParseError at %c (Hex: %x, Dec: %d)\n", current(b), current(b), current(b));
+        //             // break;
+        //             printf("Line %d: Invalid token %s encountered with value %s stack top %s\n", line, token_to_string(token), string_from(b, n), symbols[top(stack)]);
 
-        // // if(new_lexeme_req == 1){
-        // //     continue;
-        // // }
+        //             // if (parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFollow) {
+        //             //     pop(stack);
+        //             //     // goto label;
+        //             //     continue;
+        //             // }
+        //             // else {
+        //             //     // new_lexeme_req = 1;
+        //             //     line += skip_whitespace(b);
+        //             //     break;
+        //             // }
 
-        // while (!is_non_terminal(top(stack))) {
+        //             while (!is_empty(stack) && !is_end_symbol(top(stack)) && is_non_terminal(top(stack)) && !parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFirst && !parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFollow) {
+        //                 pop(stack);
+        //             }
+        //             if (!is_non_terminal(top(stack))) {
+        //                 break;
+        //             }
+        //             if (parse_table[top(stack) - SYMBOLS_LEN + NT_LEN][token].isFirst) {
+        //                 goto label;
+        //             } else {
+        //                 pop(stack);
+        //                 goto label;
+        //             }
+        //         }
+        //         push_rule_to_stack(stack, grammar_rules, symbol_map, rule_no);
+        //         // printf("Rule Used: %d\n", rule_no);
+        //         fprintf(fd, "Rule Used: %d and lexeme: %s\n", rule_no, string_from(b, n));
+        //     }
+
+        //     // printf("Now stack is: \n");
+        //     // printStack(stack);
+
+        //     // if(new_lexeme_req == 1){
+        //     //     continue;
+        //     // }
+
+        //     // while (!is_non_terminal(top(stack))) {
         //     if (top(stack) == token) {
-        //         printf("Matched: %s\n", token_to_string(token));
+        //         // printf("Matched: %s\n", token_to_string(token));
         //         pop(stack);
-        //         t = 0;
-        //         break;
+
+        //         // break;
         //     } else {
         //         // printf("I GIVE UP: Top of Stack: %s, Token: %s\n", symbols[top(stack)], token_to_string(token));
         //         // break;
-        //         if (t == 0)
-        //             printf("Line %d: Error: The token %s for lexeme %s does not match with the expected token %s\n", line, token_to_string(token), string_from(b, n), token_to_string(top(stack)));
-        //         t = 1;
+
+        //         printf("Line %d: Error: The token %s for lexeme %s does not match with the expected token %s\n", line, token_to_string(token), string_from(b, n), token_to_string(top(stack)));
+
         //         // break;
         //         pop(stack);
-        //         // goto label;
+        //         goto label;
         //     }
-        // }
+        //     // }
         line += skip_whitespace(b);
     }
 
     if (top(stack) == string_to_symbol("$", symbol_map)) {
-        printf("Parsing Successful\n");
+        if (current(b) == EOF) {
+            printf("Parsing Successful\n");
+        } else {
+            printf("Parsing Error: Extra tokens after the end of the program\n");
+        }
+        // printf("Parsing Successful\n");
     }
 
+    // TREENODE parseTree = newNode(string_to_symbol("program", symbol_map));
+    // int rule_index = 0;
+    // for(int i=0;i<currentRule;i++){
+    //     printf("%d\n", rules_used[i]);
+    // }
+    // populateNode(parseTree, rules_used, &rule_index, grammar_rules);
+    // printf("TreeDone\n");
+    // printTree(parseTree, 1);
     close_buf(b);
-    // fclose(fd);
+    fclose(fd);
 
     return 0;
 }

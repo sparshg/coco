@@ -166,13 +166,7 @@ void init_stack(STACK stack, HASHMAP symbol_map) {
     push(stack, string_to_symbol("program", symbol_map));
 }
 
-int is_non_terminal(int symbol) {
-    return symbol >= SYMBOLS_LEN - NT_LEN;
-}
 
-int is_end_symbol(int symbol) {
-    return symbol == TOKENS_LEN;
-}
 
 // int getSetTable() {
 //     int** symbolTable = (int**)malloc(NT_LEN * sizeof(int*));

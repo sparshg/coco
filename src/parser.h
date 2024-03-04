@@ -22,8 +22,6 @@ ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map);
 void print_parse_table(ParseEntry** parse_table);
 void push_rule_to_stack(STACK stack, int** grammar_rules, HASHMAP symbol_map, int rule_no);
 void init_stack(STACK stack, HASHMAP symbol_map);
-int is_non_terminal(int symbol);
-int is_end_symbol(int symbol);
 int is_rule_nullable(int** grammar_rules, int rule_no, HASHMAP symbol_map);
 
 #endif

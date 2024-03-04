@@ -29,3 +29,11 @@ Token string_to_symbol(char* str, HASHMAP symbol_map) {
 char* token_to_string(Token token) {
     return (char*)symbols[token];
 }
+
+int is_non_terminal(int symbol) {
+    return symbol >= SYMBOLS_LEN - NT_LEN;
+}
+
+int is_end_symbol(int symbol) {
+    return symbol == TOKENS_LEN;
+}
