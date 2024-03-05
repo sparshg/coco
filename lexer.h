@@ -1,5 +1,11 @@
-#ifndef LEXER
-#define LEXER
+// Group 26
+// Rishi Gupta     (2021A7PS0690P)
+// Sparsh Goenka   (2021A7PS2413P)
+// Utkarsh Sharma  (2021A7PS0693P)
+// Saumya Sharma   (2021A7PS0544P)
+// Akshat Bajpai   (2021A7PS0573P)
+#ifndef LEXER_H
+#define LEXER_H
 #include "buffer.h"
 #include "hashmap.h"
 #include "tokens.h"
@@ -20,6 +26,5 @@ Token try_id(BUF b, HASHMAP table);
 Token try_number(BUF b);
 Token try_multipath(BUF b);
 void remove_comments(char* testcaseFile);
-void print_lexer_output(char* testcaseFile);
 
 #endif

@@ -1,3 +1,10 @@
+// Group 26
+// Rishi Gupta     (2021A7PS0690P)
+// Sparsh Goenka   (2021A7PS2413P)
+// Utkarsh Sharma  (2021A7PS0693P)
+// Saumya Sharma   (2021A7PS0544P)
+// Akshat Bajpai   (2021A7PS0573P)
+
 #include "lexer.h"
 
 #include <ctype.h>
@@ -189,7 +196,7 @@ void remove_comments(char* testcaseFile) {
 
     if (!src_file) {
         printf("Error in Opening Files!\nComment Removal Aborted!\n");
-        exit(1);
+        return;
     }
 
     while (fgets(buffer, 1024, src_file)) {
@@ -218,7 +225,7 @@ Token get_next_token(BUF b, HASHMAP keyword_table, int* line, int* last_state, i
     if (token < 0) {
         switch (token) {
             case WRONG_SYMBOL:
-                printf("Line %-3d| Error: Unknown symbol %c\n", *line, current(b));
+                printf("Line %-3d| Error: Unknown symbol <%c>\n", *line, current(b));
                 next(b);
                 break;
             case VAR_LEN_EXCEED:
@@ -230,7 +237,7 @@ Token get_next_token(BUF b, HASHMAP keyword_table, int* line, int* last_state, i
             default:
                 back(b);
                 char* str = string_from(b, *last_state);
-                printf("Line %-3d| Error: Unknown pattern %s\n", *line, str);
+                printf("Line %-3d| Error: Unknown pattern <%s>\n", *line, str);
                 free(str);
                 break;
         }

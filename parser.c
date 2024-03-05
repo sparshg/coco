@@ -1,5 +1,10 @@
+// Group 26
+// Rishi Gupta     (2021A7PS0690P)
+// Sparsh Goenka   (2021A7PS2413P)
+// Utkarsh Sharma  (2021A7PS0693P)
+// Saumya Sharma   (2021A7PS0544P)
+// Akshat Bajpai   (2021A7PS0573P)
 #include "parser.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +18,13 @@ int** create_grammar_table() {
         }
     }
     return grammar_rules;
+}
+
+void delete_grammar_table(int** grammar_rules) {
+    for (int i = 0; i < PROD_RULES_LEN; i++) {
+        free(grammar_rules[i]);
+    }
+    free(grammar_rules);
 }
 
 int** get_grammar_rules(HASHMAP symbol_map) {
@@ -54,6 +66,12 @@ ParseEntry** create_parse_table() {
         }
     }
     return parse_table;
+}
+
+void delete_parse_table(ParseEntry** parse_table) {
+    for (int i = 0; i < NT_LEN; i++)
+        free(parse_table[i]);
+    free(parse_table);
 }
 
 void print_parse_table(ParseEntry** parse_table) {
@@ -154,15 +172,21 @@ void push_rule(STACK stack, int** grammar_rules, HASHMAP symbol_map, int rule_no
     }
 }
 
-void print_parse_tree(FILE* f, TREENODE parseTree) {
+void print_parse_tree(char* dest, TREENODE parseTree) {
+    FILE* f = fopen(dest, "w");
+    if (f == NULL) {
+        perror("Error opening file");
+        return;
+    }
     fprintf(f, "---------------------------------------------------------------------------------------------------------------------------------------\n");
     fprintf(f, "--------------------------------------------------------------Parse Tree--------------------------------------------------------------\n\n");
     fprintf(f, "%25s%10s%15s%15s%25s%20s%25s\n", "LEXEME", "LINE NO.", "TOKEN_NAME", "VALUE_IF_NUM", "PARENT_SYMBOL", "IS_LEAF_NODE", "NODE_SYMBOL");
     fprintf(f, "---------------------------------------------------------------------------------------------------------------------------------------\n");
     print_tree(f, parseTree, "ROOT");
+    fclose(f);
 }
 
-TREENODE parse_input_source_code(BUF b, char* dest, HASHMAP keyword_table, HASHMAP symbol_map, int** grammar_rules, ParseEntry** parse_table, int* nullable) {
+TREENODE parse_input_source_code(BUF b, HASHMAP keyword_table, HASHMAP symbol_map, int** grammar_rules, ParseEntry** parse_table, int* nullable) {
     STACK stack = create_stack();
 
     TREENODE parseTree = push(stack, string_to_symbol("program", symbol_map), NULL, -1);
@@ -218,16 +242,6 @@ TREENODE parse_input_source_code(BUF b, char* dest, HASHMAP keyword_table, HASHM
     } else {
         printf("Parsing Error: Stack not empty.\n");
     }
-
-
-    FILE* f = fopen(dest, "w");
-    if (f == NULL) {
-        perror("Error opening file");
-        return parseTree;
-    }
-    print_parse_tree(f, parseTree);
-    fclose(f);
-    // print_parse_tree(stdout, parseTree);
 
     delete_stack(stack);
     return parseTree;

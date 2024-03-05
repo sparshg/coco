@@ -1,3 +1,9 @@
+// Group 26
+// Rishi Gupta     (2021A7PS0690P)
+// Sparsh Goenka   (2021A7PS2413P)
+// Utkarsh Sharma  (2021A7PS0693P)
+// Saumya Sharma   (2021A7PS0544P)
+// Akshat Bajpai   (2021A7PS0573P)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,32 +17,25 @@
 #include "tokens.h"
 #include "tree.h"
 
-//     TREENODE parseTree = newNode(string_to_symbol("program", symbol_map));
-//     int rule_index = 0;
-//     for(int i=0;i<currentRule;i++){
-//         printf("%d\n", rules_used[i]);
-//     }
-//     populateNode(parseTree, rules_used, &rule_index, grammar_rules);
-//     // printf("TreeDone\n");
-//     // printTree(parseTree, 1);
-
-//     close_buf(b);
-//     fclose(fd);
-
-// }
-
 int main(int argc, char* argv[]) {
     if (argc != 3) {
         printf("Usage: ./stage1exe <input_file> <parse_tree_out_file>\n");
         return 0;
     }
-    printf("=========================================================================\n");
-    printf("----------------------Welcome to CoCo Compiler v1.0----------------------\n");
-    printf("=========================================================================\n\n");
-    printf("Dear User,\n");
-    printf("This sophisticated compiler has been meticulously crafted to facilitate the compilation process of programs written in CoCo, ensuring precision, efficiency, and reliability.\n");
+    printf("===========================================================================\n");
+    printf("-----------------------Welcome to CoCo Compiler v1.0-----------------------\n");
+    printf("---------------------------------Group 26----------------------------------\n");
+    printf("===========================================================================\n\n");
+    printf("This sophisticated compiler has been meticulously crafted to facilitate the compilation process of programs written in CoCo, ensuring precision, efficiency, and reliability.\n\n");
 
-    printf("As you engage with our compiler, we encourage adherence to best practices in software development, leveraging the robust capabilities embedded within our framework to unleash the full potential of your programming endeavors.");
+    printf("Implementation Status:\n");
+    printf("a:  FIRST and FOLLOW sets semi-automated (details in documentation)\n");
+    printf("b:  Lexical Analyser module has been implemented\n");
+    printf("c:  Syntactic Analysis module has been implemented\n");
+    printf("d:  All modules compile successfully and run without any segmentation fault\n");
+    printf("e:  Modules work with all the test case files (t1 to t6)\n");
+    printf("f:  Parse Tree constructed and written to file successfully\n");
+    printf("g:  Parsing Error Recovery Implemented\n");
 
     HASHMAP keyword_table = create_keyword_table();
     HASHMAP symbol_map = create_symbol_map();
@@ -74,7 +73,8 @@ int main(int argc, char* argv[]) {
                 break;
             }
             case 3: {
-                parse_input_source_code(b, argv[2], keyword_table, symbol_map, grammar_rules, parse_table, nullable_nt);
+                TREENODE parse_tree = parse_input_source_code(b, keyword_table, symbol_map, grammar_rules, parse_table, nullable_nt);
+                print_parse_tree(argv[2], parse_tree);
                 break;
             }
             case 4: {
@@ -82,13 +82,14 @@ int main(int argc, char* argv[]) {
                 double total_CPU_time, total_CPU_time_in_seconds;
                 start_time = clock();
 
-                parse_input_source_code(b, argv[2], keyword_table, symbol_map, grammar_rules, parse_table, nullable_nt);
+                TREENODE parse_tree = parse_input_source_code(b, keyword_table, symbol_map, grammar_rules, parse_table, nullable_nt);
 
                 end_time = clock();
                 total_CPU_time = (double)(end_time - start_time);
                 total_CPU_time_in_seconds = total_CPU_time / CLOCKS_PER_SEC;
                 printf("\nTotal CPU Time: %lf\n", total_CPU_time);
-                printf("Total CPU Time: %lf sec\n", total_CPU_time_in_seconds);
+                printf("Total CPU Time in seconds: %lf\n", total_CPU_time_in_seconds);
+                print_parse_tree(argv[2], parse_tree);
                 break;
             }
             default:
@@ -100,11 +101,13 @@ int main(int argc, char* argv[]) {
 
     delete_hashmap(keyword_table);
     delete_hashmap(symbol_map);
+    delete_grammar_table(grammar_rules);
+    delete_parse_table(parse_table);
 
-    printf("=================================================================================\n");
-    printf("----------------------------Thank you for using CoCo!----------------------------\n");
-    printf("=================================================================================\n\n");
-    printf("Group Memebers:\n");
+    printf("=============================================================================\n");
+    printf("--------------------------Thank you for using CoCo!--------------------------\n");
+    printf("=============================================================================\n\n");
+    printf("Group 26:\n");
     printf("Rishi Gupta     (2021A7PS0690P)\n");
     printf("Sparsh Goenka   (2021A7PS2413P)\n");
     printf("Utkarsh Sharma  (2021A7PS0693P)\n");

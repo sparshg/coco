@@ -1,4 +1,4 @@
-SRC_DIR = src
+SRC_DIR = .
 TARGET_DIR = target
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
