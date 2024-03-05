@@ -219,10 +219,6 @@ TREENODE parse_input_source_code(BUF b, char* dest, HASHMAP keyword_table, HASHM
         printf("Parsing Error: Stack not empty.\n");
     }
 
-    if (dest == NULL) {
-        delete_stack(stack);
-        return parseTree;
-    }
 
     FILE* f = fopen(dest, "w");
     if (f == NULL) {
@@ -231,7 +227,7 @@ TREENODE parse_input_source_code(BUF b, char* dest, HASHMAP keyword_table, HASHM
     }
     print_parse_tree(f, parseTree);
     fclose(f);
-    print_parse_tree(stdout, parseTree);
+    // print_parse_tree(stdout, parseTree);
 
     delete_stack(stack);
     return parseTree;

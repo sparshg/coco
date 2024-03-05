@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
                 double total_CPU_time, total_CPU_time_in_seconds;
                 start_time = clock();
 
-                parse_input_source_code(b, NULL, keyword_table, symbol_map, grammar_rules, parse_table, nullable_nt);
+                parse_input_source_code(b, argv[2], keyword_table, symbol_map, grammar_rules, parse_table, nullable_nt);
 
                 end_time = clock();
                 total_CPU_time = (double)(end_time - start_time);
