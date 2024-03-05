@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------Parse Table--------------------------------------------------------------
+
+                   LEXEME  LINE NO.     TOKEN_NAME   VALUE_IF_NUM            PARENT_SYMBOL        IS_LEAF_NODE              NODE_SYMBOL
+---------------------------------------------------------------------------------------------------------------------------------------
+                     ----      ----        epsilon           ----           otherFunctions                 Yes                     ----
+                     ----      ----           ----           ----                  program                  No           otherFunctions
+                     ----      ----           ----           ----                     ROOT                  No                  program
+                    _main         1        TK_MAIN           ----             mainFunction                 Yes                     ----
+                     ----      ----           ----           ----                  program                  No             mainFunction
+                     ----      ----        epsilon           ----          typeDefinitions                 Yes                     ----
+                     ----      ----           ----           ----                    stmts                  No          typeDefinitions
+                     ----      ----           ----           ----             mainFunction                  No                    stmts
+                     ----      ----        epsilon           ----             declarations                 Yes                     ----
+                     ----      ----           ----           ----                    stmts                  No             declarations
+                     ----      ----        epsilon           ----               otherStmts                 Yes                     ----
+                     ----      ----           ----           ----                    stmts                  No               otherStmts
+                   return         2      TK_RETURN           ----               returnStmt                 Yes                     ----
+                     ----      ----           ----           ----                    stmts                  No               returnStmt
+                     ----      ----        epsilon           ----           optionalReturn                 Yes                     ----
+                     ----      ----           ----           ----               returnStmt                  No           optionalReturn
+                        ;         2         TK_SEM           ----               returnStmt                 Yes                     ----
+                      end         3         TK_END           ----             mainFunction                 Yes                     ----

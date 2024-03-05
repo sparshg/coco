@@ -18,6 +18,6 @@ struct TreeNode {
 
 TREENODE create_node(int symbolId, char* lexeme, int line);
 void add_child(TREENODE node, TREENODE child);
-void print_tree(TREENODE node, int parent_sym);
+void print_tree(FILE* f, TREENODE node, char* parent_sym);
 
 #endif

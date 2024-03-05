@@ -154,7 +154,15 @@ void push_rule(STACK stack, int** grammar_rules, HASHMAP symbol_map, int rule_no
     }
 }
 
-TREENODE parse_input_source_code(BUF b, HASHMAP keyword_table, HASHMAP symbol_map, int** grammar_rules, ParseEntry** parse_table, int* nullable) {
+void print_parse_tree(FILE* f, TREENODE parseTree) {
+    fprintf(f, "---------------------------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(f, "--------------------------------------------------------------Parse Table--------------------------------------------------------------\n\n");
+    fprintf(f, "%25s%10s%15s%15s%25s%20s%25s\n", "LEXEME", "LINE NO.", "TOKEN_NAME", "VALUE_IF_NUM", "PARENT_SYMBOL", "IS_LEAF_NODE", "NODE_SYMBOL");
+    fprintf(f, "---------------------------------------------------------------------------------------------------------------------------------------\n");
+    print_tree(f, parseTree, "ROOT");
+}
+
+TREENODE parse_input_source_code(BUF b, char* dest, HASHMAP keyword_table, HASHMAP symbol_map, int** grammar_rules, ParseEntry** parse_table, int* nullable) {
     STACK stack = create_stack();
 
     TREENODE parseTree = push(stack, string_to_symbol("program", symbol_map), NULL, -1);
@@ -211,9 +219,19 @@ TREENODE parse_input_source_code(BUF b, HASHMAP keyword_table, HASHMAP symbol_ma
         printf("Parsing Error: Stack not empty.\n");
     }
 
-    printf("%20s%10s%15s%15s%30s%20s%30s\n", "LEXEME", "LINE NO.", "TOKEN NAME", "VALUE IF NUM", "PARENT SYMBOL", "IS LEAF NODE", "NODE SYMBOL");
-    printf("----------------------------------------------------------------------------------------------------------------------------------------------\n");
-    print_tree(parseTree, -1);
+    if (dest == NULL) {
+        delete_stack(stack);
+        return parseTree;
+    }
+
+    FILE* f = fopen(dest, "w");
+    if (f == NULL) {
+        perror("Error opening file");
+        return parseTree;
+    }
+    print_parse_tree(f, parseTree);
+    fclose(f);
+    print_parse_tree(stdout, parseTree);
 
     delete_stack(stack);
     return parseTree;

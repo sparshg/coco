@@ -10,14 +10,14 @@ default: run
 $(TARGET_DIR)/%.o: $(SRC_DIR)/%.c $(HEADERS)
 	@gcc -g -c $< -o $@
 
-$(TARGET_DIR)/program: $(OBJECTS)
+stage1exe: $(OBJECTS)
 	@gcc -g $(OBJECTS) -o $@
 
-build: $(TARGET_DIR)/program
+build: stage1exe
 
-run: $(TARGET_DIR)/program
-	@$(TARGET_DIR)/program
+run: stage1exe
+	@./stage1exe
 
 clean:
 	@-rm -f $(OBJECTS)
-	@-rm -f $(TARGET_DIR)/program
+	@-rm -f stage1exe
