@@ -7,8 +7,11 @@ OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(TARGET_DIR)/%.o,$(SRCS))
 
 default: run
 
-$(TARGET_DIR)/%.o: $(SRC_DIR)/%.c $(HEADERS)
+$(TARGET_DIR)/%.o: $(SRC_DIR)/%.c $(HEADERS) | TARGET_DIR
 	@gcc -g -c $< -o $@
+
+TARGET_DIR:
+	@mkdir -p $(TARGET_DIR)
 
 stage1exe: $(OBJECTS)
 	@gcc -g $(OBJECTS) -o $@

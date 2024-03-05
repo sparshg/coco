@@ -28,11 +28,11 @@
 int main(int argc, char* argv[]) {
     if (argc != 3) {
         printf("Usage: ./stage1exe <input_file> <parse_tree_out_file>\n");
-        return 1;
+        return 0;
     }
     printf("=========================================================================\n");
     printf("----------------------Welcome to CoCo Compiler v1.0----------------------\n");
-    printf("===================================--====================================\n\n");
+    printf("=========================================================================\n\n");
     printf("Dear User,\n");
     printf("This sophisticated compiler has been meticulously crafted to facilitate the compilation process of programs written in CoCo, ensuring precision, efficiency, and reliability.\n");
 

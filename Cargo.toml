@@ -7,3 +7,4 @@ edition = "2021"
 
 [[bin]]
 name = "coco"
+path = "src/firstfollow.rs"
