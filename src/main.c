@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
     // printf("Enter option: ");
     // scanf("%d", &option);
 
-    BUF b = read_file("t5.txt");
+    BUF b = read_file("t6.txt");
 
     switch (3) {
         case 0:

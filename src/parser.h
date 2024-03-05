@@ -24,8 +24,6 @@ ParseEntry** create_parse_table();
 int** get_grammar_rules(HASHMAP grammarIndex);
 ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map, int* nullable);
 void print_parse_table(ParseEntry** parse_table);
-void push_rule_to_stack(STACK stack, int** grammar_rules, HASHMAP symbol_map, int rule_no);
-void init_stack(STACK stack, HASHMAP symbol_map);
 TREENODE parse_input_source_code(BUF b, HASHMAP keyword_table, HASHMAP symbol_map, int** grammar_rules, ParseEntry** parse_table, int* nullable);
 
 #endif

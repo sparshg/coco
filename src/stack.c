@@ -2,7 +2,7 @@
 
 STACK create_stack() {
     STACK stack = (STACK)malloc(sizeof(Stack));
-    stack->data = (int*)malloc(sizeof(int) * MAX_STACK_SIZE);
+    stack->data = (TREENODE*)malloc(MAX_STACK_SIZE * sizeof(TREENODE));
     stack->top = -1;
     return stack;
 }
@@ -15,35 +15,35 @@ int size(STACK stack) {
     return stack->top + 1;
 }
 
-void push(STACK stack, int value) {
+TREENODE push(STACK stack, int symbolId, char* lexeme, int line) {
     if (stack->top == MAX_STACK_SIZE - 1) {
         printf("Stack Overflow\n");
-        return;
+        exit(1);
     }
-    stack->data[++stack->top] = value;
-    return;
+    TREENODE node = create_node(symbolId, lexeme, line);
+    stack->data[++stack->top] = node;
+    return node;
 }
 
-void pop(STACK stack) {
+TREENODE pop(STACK stack) {
     if (is_empty(stack)) {
         printf("Stack Underflow\n");
-        return;
+        exit(1);
     }
-    stack->top--;
-    return;
+    return stack->data[stack->top--];
 }
 
-int top(STACK stack) {
+TREENODE top(STACK stack) {
     if (is_empty(stack)) {
         printf("Stack is Empty!\n");
-        return -1;
+        exit(1);
     }
     return stack->data[stack->top];
 }
 
 void print_stack(STACK stack) {
     for (int i = 0; i <= stack->top; i++) {
-        printf("%d ", stack->data[i]);
+        printf("%d ", stack->data[i]->symbol);
     }
     printf("<--TOP \n");
 }

@@ -91,7 +91,6 @@ ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map, int* nulla
     const int SIZE = 256;
     char line[SIZE];
     int rule = 0;
-    int epsilon = string_to_symbol("#", symbol_map);
     // printf("\n%d ", rule + 1);
 
     while (fgets(line, SIZE, fd)) {
@@ -101,7 +100,7 @@ ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map, int* nulla
             int tokenID = string_to_symbol(token, symbol_map);
             // printf("%s[%d][%d] ", token, rule_to_nt(rule, grammar_rules), tokenID);
             token = strtok(NULL, " ");
-            if (tokenID == epsilon) {
+            if (is_epsilon(tokenID)) {
                 can_eps = 1;
                 nullable_nt[rule_to_nt(rule, grammar_rules)] = 1;
                 continue;
@@ -140,100 +139,82 @@ ParseEntry** get_parse_table(int** grammar_rules, HASHMAP symbol_map, int* nulla
     return parse_table;
 }
 
-void push_rule_to_stack(STACK stack, int** grammar_rules, HASHMAP symbol_map, int rule_no) {
-    if (grammar_rules[rule_no][0] == 2 && grammar_rules[rule_no][2] == string_to_symbol("#", symbol_map)) {
-        pop(stack);
+void push_rule(STACK stack, int** grammar_rules, HASHMAP symbol_map, int rule_no) {
+    if (grammar_rules[rule_no][0] == 2 && is_epsilon(grammar_rules[rule_no][2])) {
+        add_child(pop(stack), create_node(string_to_symbol("#", symbol_map), NULL, -1));
         return;
     }
 
     int* rule = grammar_rules[rule_no];
-    pop(stack);
-    for (int i = rule[0]; i > 1; i--) {
-        push(stack, rule[i]);
-    }
-}
+    TREENODE parent = pop(stack);
 
-void init_stack(STACK stack, HASHMAP symbol_map) {
-    push(stack, string_to_symbol("$", symbol_map));
-    push(stack, string_to_symbol("program", symbol_map));
+    // rule[0] is the length of the rule
+    for (int i = rule[0]; i > 1; i--) {
+        add_child(parent, push(stack, rule[i], NULL, -1));
+    }
 }
 
 TREENODE parse_input_source_code(BUF b, HASHMAP keyword_table, HASHMAP symbol_map, int** grammar_rules, ParseEntry** parse_table, int* nullable) {
     STACK stack = create_stack();
-    init_stack(stack, symbol_map);
 
-    int line = 1;
+    TREENODE parseTree = push(stack, string_to_symbol("program", symbol_map), NULL, -1);
 
-    int rules_used[MAX_RULES_USED];
-    for (int i = 0; i < MAX_RULES_USED; i++) {
-        rules_used[i] = -1;
-    }
+    int last_state, line = 1;
+    Token token = get_next_token(b, keyword_table, &line, &last_state, 0);
 
-    int rules_used_idx = 0;
-    int n;
-
-    Token token = get_next_token(b, keyword_table, &line, &n, 0);
     while (current(b) != EOF) {
-        if (top(stack) == string_to_symbol("$", symbol_map) || is_empty(stack))
+        if (is_empty(stack))
             break;
-        if (is_non_terminal(top(stack))) {
-            ParseEntry rule = parse_table[symbol_to_nt(top(stack))][token];
+        // if top of stack is non terminal
+        if (symbol_to_nt(top(stack)->symbol) >= 0) {
+            ParseEntry rule = parse_table[symbol_to_nt(top(stack)->symbol)][token];
             if (rule.rule_no == -1) {
-                if (nullable[symbol_to_nt(top(stack))]) {
+                if (nullable[symbol_to_nt(top(stack)->symbol)]) {
                     pop(stack);
                     continue;
                 }
-                printf("Line %-3d| Invalid token %s encountered with value %s stack top %s\n", line, token_to_string(token), string_from(b, n), symbols[top(stack)]);
+                char* lexeme = string_from(b, last_state);
+                printf("Line %-3d| Invalid token %s encountered with value %s stack top %s\n", line, symbol_to_string(token), lexeme, symbols[top(stack)->symbol]);
+                free(lexeme);
 
                 if (!rule.isFollow) {
-                    token = get_next_token(b, keyword_table, &line, &n, 0);
+                    token = get_next_token(b, keyword_table, &line, &last_state, 0);
                     continue;
                 }
                 pop(stack);
             } else {
-                push_rule_to_stack(stack, grammar_rules, symbol_map, rule.rule_no);
-                rules_used[rules_used_idx++] = rule.rule_no;
+                push_rule(stack, grammar_rules, symbol_map, rule.rule_no);
             }
         } else {
-            if (top(stack) == token) {
+            if (top(stack)->symbol == token) {
                 // printf("Matched: %s\n", token_to_string(token));
-                pop(stack);
-                token = get_next_token(b, keyword_table, &line, &n, 0);
+                TREENODE top = pop(stack);
+                top->lexeme = string_from(b, last_state);
+                top->line = line;
+                token = get_next_token(b, keyword_table, &line, &last_state, 0);
             } else {
-                printf("Line %-3d| Error: The token %s for lexeme %s does not match with the expected token %s\n", line, token_to_string(token), string_from(b, n), token_to_string(top(stack)));
+                char* lexeme = string_from(b, last_state);
+                printf("Line %-3d| Error: The token %s for lexeme %s does not match with the expected token %s\n", line, symbol_to_string(token), lexeme, symbol_to_string(top(stack)->symbol));
+                free(lexeme);
                 pop(stack);
             }
         }
     }
 
-    if (top(stack) == string_to_symbol("$", symbol_map)) {
+    if (is_empty(stack)) {
         if (current(b) == EOF) {
             printf("Parsing Successful!\n");
         } else {
             printf("Parsing Error: Extra tokens after the end of the program.\n");
         }
     } else {
-        printf("Parsing Error: Some syntactical errors found.\n");
+        printf("Parsing Error: Stack not empty.\n");
     }
 
+    printf("%20s%10s%15s%15s%30s%20s%30s\n", "LEXEME", "LINE NO.", "TOKEN NAME", "VALUE IF NUM", "PARENT SYMBOL", "IS LEAF NODE", "NODE SYMBOL");
+    printf("----------------------------------------------------------------------------------------------------------------------------------------------\n");
+    print_tree(parseTree, -1);
+
     delete_stack(stack);
-
-    printf("Constructing Parse Tree!\n");
-    TREENODE parseTree = newNode(string_to_symbol("program", symbol_map));
-    int rule_index = 0;
-    populateNode(parseTree, rules_used, &rule_index, grammar_rules);
-    printf("Parse Tree Constructed!\n");
-
     return parseTree;
 }
-
-// int getSetTable() {
-//     int** symbolTable = (int**)malloc(NT_LEN * sizeof(int*));
-//     for (int i = 0; i < NT_LEN; i++) {
-//         symbolTable[i] = (int*)malloc(15 * sizeof(int));
-//         for (int j = 0; j < 15; j++) {
-//             symbolTable[i][j] = 0;
-//         }
-//     }
-//     return symbolTable;
-// }

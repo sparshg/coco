@@ -22,20 +22,15 @@ HASHMAP create_symbol_map() {
     return map;
 }
 
-Token string_to_symbol(char* str, HASHMAP symbol_map) {
+int string_to_symbol(char* str, HASHMAP symbol_map) {
     return get(symbol_map, str, strlen(str));
 }
 
-char* token_to_string(Token token) {
-    return (char*)symbols[token];
-}
-
-int is_non_terminal(int symbol) {
-    return symbol >= SYMBOLS_LEN - NT_LEN;
-}
-
-int is_end_symbol(int symbol) {
-    return symbol == TOKENS_LEN;
+char* symbol_to_string(int symbol) {
+    if (symbol < 0 || symbol >= SYMBOLS_LEN) {
+        return NULL;
+    }
+    return (char*)symbols[symbol];
 }
 
 int rule_to_nt(int rule_no, int** grammar_rules) {
@@ -44,4 +39,16 @@ int rule_to_nt(int rule_no, int** grammar_rules) {
 
 int symbol_to_nt(int symbol) {
     return symbol - SYMBOLS_LEN + NT_LEN;
+}
+
+int is_epsilon(int symbol) {
+    return symbol == TOKENS_LEN + 1;
+}
+
+int nt_to_symbol(int nt) {
+    return nt + SYMBOLS_LEN - NT_LEN;
+}
+
+char* nt_to_string(int nt) {
+    return (char*)symbols[nt + SYMBOLS_LEN - NT_LEN];
 }

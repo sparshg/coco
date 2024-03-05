@@ -129,13 +129,15 @@ static const char symbols[][30] = {
 };
 
 HASHMAP create_symbol_map();
-char* token_to_string(Token token);
-Token string_to_symbol(char* str, HASHMAP symbol_map);
 HASHMAP create_keyword_table();
-int is_non_terminal(int symbol);
-int is_end_symbol(int symbol);
+
+char* symbol_to_string(int symbol);
+char* nt_to_string(int nt);
+int string_to_symbol(char* str, HASHMAP symbol_map);
+int nt_to_symbol(int nt);
 int rule_to_nt(int rule_no, int** grammar_rules);
 int symbol_to_nt(int symbol);
+int is_epsilon(int symbol);
 
 enum Token {
     TK_ASSIGNOP,

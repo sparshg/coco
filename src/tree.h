@@ -4,22 +4,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "tokens.h"
+
 typedef struct TreeNode TreeNode;
 typedef struct TreeNode* TREENODE;
 
-struct TreeNode{
-    int symbolId;
-    // int isLeaf;
+struct TreeNode {
+    // leftmost in array = rightmost in tree
     TREENODE* children;
+    char* lexeme;
+    int line, symbol, child_len;
 };
 
-TREENODE newNode(int symbolId);
-void populateNode(TREENODE node, int* rules_used, int* rule_index, int** grammar_rules);
-void printTree(TREENODE node, int level);
-
-
-
-
-
+TREENODE create_node(int symbolId, char* lexeme, int line);
+void add_child(TREENODE node, TREENODE child);
+void print_tree(TREENODE node, int parent_sym);
 
 #endif

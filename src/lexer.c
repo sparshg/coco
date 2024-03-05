@@ -156,6 +156,7 @@ Token try_id(BUF b, HASHMAP table) {
     if ((t = get(table, str, strlen(str))) != -1) {
         return t;
     }
+    free(str);
     return TK_FIELDID;
 }
 
@@ -228,7 +229,9 @@ Token get_next_token(BUF b, HASHMAP keyword_table, int* line, int* last_state, i
                 break;
             default:
                 back(b);
-                printf("Line %-3d| Error: Unknown pattern %s\n", *line, string_from(b, *last_state));
+                char* str = string_from(b, *last_state);
+                printf("Line %-3d| Error: Unknown pattern %s\n", *line, str);
+                free(str);
                 break;
         }
         *line += skip_whitespace(b);
@@ -236,11 +239,15 @@ Token get_next_token(BUF b, HASHMAP keyword_table, int* line, int* last_state, i
     }
 
     if (token == TK_COMMENT) {
-        if (prints_output) printf("Line %-3d| Lexeme %-23s Token %s\n", *line, "%", token_to_string(token));
+        if (prints_output) printf("Line %-3d| Lexeme %-23s Token %s\n", *line, "%", symbol_to_string(token));
         (*line)++;
         *line += skip_whitespace(b);
         return get_next_token(b, keyword_table, line, last_state, prints_output);
     }
-    if (prints_output) printf("Line %-3d| Lexeme %-23s Token %s\n", *line, string_from(b, *last_state), token_to_string(token));
+    if (prints_output) {
+        char* str = string_from(b, *last_state);
+        printf("Line %-3d| Lexeme %-23s Token %s\n", *line, str, symbol_to_string(token));
+        free(str);
+    }
     return token;
 }
