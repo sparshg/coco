@@ -19,6 +19,7 @@ stage1exe: $(OBJECTS)
 build: stage1exe
 
 run: stage1exe
+	@echo "Build successful"
 	@./stage1exe
 
 clean:
