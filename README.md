@@ -1,9 +1,13 @@
-# TODO:
+# Progress:
 
-- [ ] Handle File IO
-- [ ] Implement Double input buffer
-- [ ] Implement Lookup table
-- [ ] Implement keyword/indentifier lexing
+- [x] Lexer
+- [x] Lexer error handling
+- [x] First and follow sets automation
+- [x] Parse table generation
+- [x] Parse tree generation
+- [x] Parser error handling
+- [ ] Semantic analysis
+- [ ] Code generation
 
 # How to run
 
